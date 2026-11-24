@@ -33,7 +33,7 @@ class ProjectInspectionTests(unittest.TestCase):
             game.mkdir()
             (game / "script.rpy").write_text("label start:\n    return\n", encoding="utf-8")
             report = inspect_project(game)
-            self.assertEqual(report["game_directory"], str(game))
+            self.assertTrue(Path(report["game_directory"]).samefile(game))
 
 
 if __name__ == "__main__":
