@@ -12,6 +12,11 @@ collections:
 defaults:
   - scope:
       path: ""
+      type: pages
+    values:
+      layout: page
+  - scope:
+      path: ""
       type: games
     values:
       layout: game
