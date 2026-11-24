@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a non-executing `build-plan` command with separate upstream-derived checklists, host requirements and explicit manual blockers for the legacy Python 2.7 and Ren'Py 8 / Python 3.11 runtime profiles.
+
 - Added non-destructive Vita app staging into `app/<TITLE_ID>/` from supplied `game/` and `sce_sys/` directories.
 - Added bounded PSF table parsing, required TITLE_ID cross-checking, PNG IHDR dimension checks and optional LiveArea image/template inventory, symlink rejection, overwrite protection and a SHA-256 payload manifest.
 - Added CLI `stage` command and tests for successful staging, invalid IDs, malformed SFO, mismatched TITLE_ID, symlinks and destination safety.
