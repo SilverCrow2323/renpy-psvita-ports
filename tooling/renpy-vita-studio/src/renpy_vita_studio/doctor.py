@@ -38,7 +38,8 @@ def inspect_environment() -> dict:
     sdk_path_valid = bool(vita_sdk and os.path.isdir(os.path.expanduser(vita_sdk)))
 
     packaging_tools_ready = tools["vita_pack_vpk"]["available"] and tools["vita_mksfoex"]["available"]
-    if sdk_path_valid and compiler_ready and packaging_tools_ready:
+    build_tools_ready = tools["cmake"]["available"] and tools["make"]["available"]
+    if sdk_path_valid and compiler_ready and packaging_tools_ready and build_tools_ready:
         vita_status = "core-tools-detected"
     elif vita_sdk or compiler_ready or packaging_tools_ready:
         vita_status = "partial"
