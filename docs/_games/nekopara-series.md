@@ -1,36 +1,30 @@
 ---
 title: "NEKOPARA series"
 issue: 23
-status: "Suggested · multi-title evaluation required"
+status: "Series proposal · six separate title sheets"
 official: "https://store.steampowered.com/bundle/676/NEKOPARA/"
-summary: "The original issue groups Vol. 0–4 and NEKOPARA Extra in one bundle request. Each volume needs its own build identity and test record before a compatibility claim can be made."
+summary: "The original request grouped Vol. 0–4 and NEKOPARA Extra. The hub now gives each individual game its own page and leaves compatibility unverified until each build is tested."
 ---
 
 ## Overview
 
-The original issue groups Vol. 0–4 and NEKOPARA Extra in one bundle request. Each volume needs its own build identity and test record before a compatibility claim can be made.
+The original proposal grouped NEKOPARA Vol. 0–4 and NEKOPARA Extra in one request. For technical accuracy, the catalogue now separates the six games into individual sheets. The bundle page remains as a series index.
 
-## Store and project links
+## Individual title sheets
 
-- Official store / source: https://store.steampowered.com/bundle/676/NEKOPARA/
-- Community Vita project: Not supplied.
+- [NEKOPARA Vol. 0](nekopara-vol-0.md)
+- [NEKOPARA Vol. 1](nekopara-vol-1.md)
+- [NEKOPARA Vol. 2](nekopara-vol-2.md)
+- [NEKOPARA Vol. 3](nekopara-vol-3.md)
+- [NEKOPARA Vol. 4](nekopara-vol-4.md)
+- [NEKOPARA Extra](nekopara-extra.md)
 
-## Technical profile
+- [Official Steam series bundle](https://store.steampowered.com/bundle/676/NEKOPARA/)
 
-| Field | Value |
-|---|---|
-| Ren'Py version | Unknown |
-| Source platform | Unknown |
-| RPA archives | Unknown |
-| Video playback | Unknown |
-| Native extensions | Unknown |
-| Exact game build tested | No |
-| Vita runtime | Not tested |
+## Compatibility policy
 
-## Compatibility notes
+Each volume is a separate game build. A successful test, engine-version detection or conversion result for one title must not be copied to another. Record the exact Steam build, runtime and Vita test separately for every sheet.
 
-No reproducible Vita compatibility test is recorded in the source issue.
+## Source record
 
-## Next useful step
-
-Identify the exact game edition and build, inspect its project/archive structure, then run a documented test against a named Vita runtime.
+[Community proposal #23](https://github.com/SilverCrow2323/renpy-psvita-ports/issues/23)
