@@ -14,7 +14,7 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 - Lists and extracts standard RPA-2.0 and RPA-3.0 archives.
 - Uses a restricted pickle unpickler, bounded decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
 - Read-only \`doctor\` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.
-- **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, parses bounded PSF metadata, checks that `TITLE_ID` matches the requested ID and reads PNG headers, rejects symlinks and refuses to overwrite an existing target.
+- **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, parses bounded PSF metadata, checks that `TITLE_ID` matches the requested ID and checks PNG headers/dimensions, reports LiveArea assets, rejects symlinks and refuses to overwrite an existing target.
 - Writes a SHA-256 manifest for the staged payload.
 
 ## Requirements
@@ -59,7 +59,7 @@ The staging command expects a project root containing both \`game/\` and \`sce_s
 - The inspector does not execute \`options.rpy\` or other game code.
 - Staging refuses to overwrite an existing \`app/<TITLE_ID>\` and never edits the source project.
 - \`param.sfo\` is checked for a PSF header only; fields are not parsed or rewritten.
-- PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements.
+- PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements. LiveArea assets are reported, not checked against a device-specific artwork profile.
 - The manifest hashes staged payload files; it is not a signature or compatibility certificate.
 - No DRM bypass, decryption, game-data redistribution or proprietary payload bundling.
 - No VPK generation, signing or Vita installation is implemented yet.
