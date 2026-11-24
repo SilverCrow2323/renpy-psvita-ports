@@ -3,8 +3,8 @@
 ## Unreleased
 
 - Added non-destructive Vita app staging into `app/<TITLE_ID>/` from supplied `game/` and `sce_sys/` directories.
-- Added basic PSF magic/header and PNG IHDR dimension checks, symlink rejection, overwrite protection and a SHA-256 payload manifest.
-- Added CLI `stage` command and tests for successful staging, invalid IDs, invalid SFO, symlinks and destination safety.
+- Added bounded PSF table parsing, required TITLE_ID cross-checking and PNG IHDR dimension checks, symlink rejection, overwrite protection and a SHA-256 payload manifest.
+- Added CLI `stage` command and tests for successful staging, invalid IDs, malformed SFO, mismatched TITLE_ID, symlinks and destination safety.
 
 ## Unreleased
 
