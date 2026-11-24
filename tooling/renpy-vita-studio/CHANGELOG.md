@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added non-destructive Vita app staging into `app/<TITLE_ID>/` from supplied `game/` and `sce_sys/` directories.
+- Added basic PSF magic/header and PNG IHDR dimension checks, symlink rejection, overwrite protection and a SHA-256 payload manifest.
+- Added CLI `stage` command and tests for successful staging, invalid IDs, invalid SFO, symlinks and destination safety.
+
+## Unreleased
+
 - Added conservative Ren'Py engine fingerprinting from generated `renpy/vc_version.py` metadata (high confidence) and legacy literal `version_tuple` metadata (medium confidence).
 - Kept the game version (`config.version`) separate from the engine version; unknown fingerprints remain unknown.
 - Added tests for modern, legacy and ambiguous-version cases.\n- Added a read-only `doctor` command that reports host details and discovers common build/VitaSDK tools without executing them.\n- Added tests for missing and partially configured VitaSDK environments.
