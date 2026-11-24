@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .build_plan import get_build_plan
 from .inspect import inspect_project
 from .doctor import inspect_environment
 from .rpa import RpaError, extract_rpa, inspect_rpa
@@ -26,6 +27,9 @@ def _parser() -> argparse.ArgumentParser:
 
     sub.add_parser("doctor", help="check host tools and VitaSDK availability (read-only)")
     sub.add_parser("profiles", help="list inspected Ren'Py Vita runtime reference profiles")
+
+    plan = sub.add_parser("build-plan", help="show a non-executing runtime build checklist")
+    plan.add_argument("--profile", choices=("sonicmastr-python27", "grimiku-python311"), help="show one profile; omit to show both")
 
     stage = sub.add_parser("stage", help="prepare a non-destructive app/TITLE_ID staging folder")
     stage.add_argument("project", type=Path, help="project root containing game/ and sce_sys/")
@@ -62,6 +66,11 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.command == "profiles":
             print(json.dumps(list_runtime_profiles(), indent=2, ensure_ascii=False))
+            return 0
+
+        if args.command == "build-plan":
+            print(json.dumps(get_build_plan(args.profile), indent=2, ensure_ascii=False))
+            print("Build plan only: no scripts were run and no dependencies were downloaded.")
             return 0
 
         if args.command == "stage":
