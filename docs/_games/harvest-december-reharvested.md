@@ -35,7 +35,7 @@ Follow the project repository's release-specific installation instructions. Do n
 
 ## Installation and reporting guide
 
-See the [central community porting guide](../PORTING-GUIDES.md) for the documented install path, known limitations and reporting instructions.
+See the [central community porting guide](https://github.com/SilverCrow2323/renpy-psvita-ports/blob/main/docs/PORTING-GUIDES.md) for the documented install path, known limitations and reporting instructions.
 
 ## Test status
 
