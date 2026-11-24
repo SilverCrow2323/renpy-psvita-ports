@@ -2,7 +2,7 @@
 title: "Magical Literary Heroine Natsuki Saves the Literature Club! Vita"
 issue: 0
 status: "Existing Vita mod port · fresh hardware retest pending"
-cover: "${base}/Magical-Literary-Heroine-Natsuki-Saves-The-Literature-Club-Vita/main/sce_sys/pic0.png"
+cover: "https://raw.githubusercontent.com/SilverCrow2323/Magical-Literary-Heroine-Natsuki-Saves-The-Literature-Club-Vita/main/sce_sys/pic0.png"
 official: "https://www.mlhnstlc.com/"
 community_port: "https://github.com/SilverCrow2323/Magical-Literary-Heroine-Natsuki-Saves-The-Literature-Club-Vita"
 summary: "A Vita port of the Ren'Py/DDLC mod Magical Literary Heroine Natsuki Saves the Literature Club!. The project credits SonicMastr's Ren'Py Vita and DDLC Vita work."
