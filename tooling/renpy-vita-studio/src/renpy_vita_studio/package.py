@@ -22,6 +22,8 @@ def build_vpk(staged_app: str | Path, output: str | Path) -> dict:
     title_id = app.name
     if len(title_id) != 9 or not title_id.isalnum() or title_id.upper() != title_id:
         raise StageError("staged app folder must be named with its 9-character uppercase title ID")
+    if target.suffix.lower() != ".vpk":
+        raise StageError("output filename must use the .vpk extension")
     if target.exists() or target.is_symlink():
         raise StageError(f"output already exists; refusing to overwrite: {target}")
     if target in app.parents or app in target.parents:
@@ -80,6 +82,9 @@ def build_vpk(staged_app: str | Path, output: str | Path) -> dict:
             raise StageError("vita-pack-vpk returned success but did not create a non-empty output")
         try:
             with zipfile.ZipFile(target) as archive:
+                corrupt_entry = archive.testzip()
+                if corrupt_entry is not None:
+                    raise StageError(f"VPK archive CRC check failed at {corrupt_entry}")
                 names = set(archive.namelist())
         except (OSError, zipfile.BadZipFile) as exc:
             raise StageError(f"vita-pack-vpk output is not a readable VPK/ZIP archive: {exc}") from exc
