@@ -18,6 +18,11 @@ class RuntimeProfileTests(unittest.TestCase):
         self.assertEqual(report["candidates"][0]["confidence"], "strong-indicator")
         self.assertIn("not proof", report["warning"])
 
+    def test_renpy8_with_python27_is_flagged_as_conflicting(self):
+        report = assess_runtime_profile("8.1.0", ["python2.7"])
+        self.assertEqual(report["assessment"], "conflict")
+        self.assertEqual(report["candidates"][0]["match"], "conflicting-evidence")
+
     def test_mixed_python_runtimes_are_ambiguous(self):
         report = assess_runtime_profile(None, ["python2.7", "python3.11"])
         self.assertEqual(report["assessment"], "ambiguous")
