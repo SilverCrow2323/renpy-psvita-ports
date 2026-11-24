@@ -4,18 +4,18 @@
 
 A cautious inspection and preparation core for user-supplied Ren'Py projects targeting PlayStation Vita.
 
-<blockquote>
-<strong>Alpha foundation, not a one-click port converter.</strong> This first slice inventories projects and reads standard RPA-2.0 / RPA-3.0 archives. It does not patch games, run Ren'Py, build VPKs or promise compatibility.
-</blockquote>
+> **Alpha foundation, not a one-click port converter.** This tool inventories projects, reads standard RPA-2.0 / RPA-3.0 archives and prepares a non-destructive Vita app staging folder. It does not patch games, run Ren'Py, build VPKs or promise compatibility.
 
 ## Current capabilities
 
-- Read-only project inventory: `game/`, scripts, RPA archives, media, native libraries, Python runtime directories and Vita LiveArea assets.
-- Extracts conservative metadata from `game/options.rpy` without executing the script. The game version is kept separate from the Ren'Py engine version.\n- Fingerprints the engine from literal metadata in `renpy/vc_version.py` (high confidence) or a legacy literal `version_tuple` in `renpy/__init__.py` (medium confidence). Unknown versions stay unknown; bundled Python folders are supporting evidence, not a version verdict.
-- Detects video and native library files as compatibility hints.
+- Read-only project inventory: \`game/\`, scripts, RPA archives, media, native libraries, Python runtime directories and Vita LiveArea assets.
+- Reads \`game/options.rpy\` without executing it. Game version and Ren'Py engine version are kept separate.
+- Fingerprints modern engine versions from \`renpy/vc_version.py\` and legacy versions from a literal \`version_tuple\`; confidence and evidence are reported.
 - Lists and extracts standard RPA-2.0 and RPA-3.0 archives.
-- Uses a restricted pickle unpickler, bounded index decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
-- Read-only `doctor` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.\n- JSON output for future GUI integration.
+- Uses a restricted pickle unpickler, bounded decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
+- Read-only \`doctor\` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.
+- **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, checks the PSF header and PNG headers, rejects symlinks and refuses to overwrite an existing target.
+- Writes a SHA-256 manifest for the staged payload.
 
 ## Requirements
 
@@ -25,41 +25,50 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 
 ## Run from source
 
-```sh
+\`\`\`sh
 cd tooling/renpy-vita-studio
 python -m venv .venv
 # Windows: .venv\\Scripts\\activate
 # Linux:   source .venv/bin/activate
 python -m pip install -e .
-renpy-vita-studio --help\nrenpy-vita-studio doctor
-```
+renpy-vita-studio --help
+renpy-vita-studio doctor
+\`\`\`
 
 ## Examples
 
-```sh
-renpy-vita-studio inspect "/path/to/Game"
+\`\`\`sh
+# Inventory a project
 renpy-vita-studio inspect "/path/to/Game" --json
-renpy-vita-studio rpa list "/path/to/Game/game/archive.rpa" --json
-renpy-vita-studio rpa extract "/path/to/Game/game/archive.rpa" "./staging/archive"
-```
 
-The extractor refuses to overwrite an existing destination. Choose a new empty path for each extraction.
+# Inspect/extract a standard archive
+renpy-vita-studio rpa list "/path/to/Game/game/archive.rpa" --json
+renpy-vita-studio rpa extract "/path/to/Game/game/archive.rpa" "./rpa-extract"
+
+# Prepare a Vita app folder (does not create a VPK)
+renpy-vita-studio stage "/path/to/Game" "./vita-output" --title-id PCSE00001
+\`\`\`
+
+The staging command expects a project root containing both \`game/\` and \`sce_sys/\`, including \`sce_sys/param.sfo\` and \`sce_sys/icon0.png\`. It creates \`vita-output/app/PCSE00001/\`. Supply the correct title ID and metadata yourself; the tool does not invent or rewrite them.
 
 ## Safety boundaries
 
 - Only standard RPA-2.0 and RPA-3.0 are supported in this preview.
 - Custom/encrypted archive variants and RPA-1.0 / standalone RPI are not supported.
 - RPYC files are inventoried but never unpickled or decompiled.
-- The inspector does not execute `options.rpy` or other game code.
-- Engine version detection is deliberately limited to supported literal fingerprints; a missing or ambiguous fingerprint remains unknown.
+- The inspector does not execute \`options.rpy\` or other game code.
+- Staging refuses to overwrite an existing \`app/<TITLE_ID>\` and never edits the source project.
+- \`param.sfo\` is checked for a PSF header only; fields are not parsed or rewritten.
+- PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements.
+- The manifest hashes staged payload files; it is not a signature or compatibility certificate.
 - No DRM bypass, decryption, game-data redistribution or proprietary payload bundling.
-- No VPK generation or Vita installation is implemented yet.
+- No VPK generation, signing or Vita installation is implemented yet.
 
 ## Development
 
-```sh
+\`\`\`sh
 PYTHONPATH=src python -m unittest discover -s tests -v
-```
+\`\`\`
 
 ## Relationship to upstream
 
@@ -67,9 +76,9 @@ The native runtime baseline is [SonicMastr/renpy-vita](https://github.com/SonicM
 
 ## Roadmap
 
-1. RPA fixture coverage and cross-platform CI.
-2. Better engine/runtime fingerprinting with explicit confidence levels.
-3. LiveArea/SFO validation and a non-destructive staging builder.
-4. VitaSDK-backed VPK packaging with reproducible manifests.
+1. Broaden archive fixtures and engine/runtime fingerprint coverage.
+2. Validate LiveArea asset dimensions and parse SFO fields safely.
+3. Add explicit profile adapters for supported Vita runtimes.
+4. Build a reproducible VitaSDK-backed VPK packager.
 5. Desktop GUI and optional USB/network device integration.
 6. Evaluate a Vita-side companion only for tasks that fit Vita memory and native APIs.
