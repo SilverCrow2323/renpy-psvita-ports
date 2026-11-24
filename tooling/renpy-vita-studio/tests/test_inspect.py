@@ -75,6 +75,7 @@ class ProjectInspectionTests(unittest.TestCase):
             root = Path(tmp)
             (root / "game").mkdir()
             (root / "lib" / "python3.11").mkdir(parents=True)
+            (root / "lib" / "python3.11" / "os.py").write_text("# runtime marker", encoding="utf-8")
             (root / "renpy").mkdir()
             (root / "renpy" / "vc_version.py").write_text(
                 "version = '8.3.4'\n", encoding="utf-8"
