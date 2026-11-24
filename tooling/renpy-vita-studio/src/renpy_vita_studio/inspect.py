@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from .runtime_profiles import assess_runtime_profile
+
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".ogv", ".ogg", ".mkv", ".avi", ".mov", ".mpeg", ".mpg"}
 NATIVE_EXTENSIONS = {".so", ".dll", ".pyd", ".dylib"}
 MAX_OPTIONS_BYTES = 2 * 1024 * 1024
@@ -135,7 +137,16 @@ def inspect_project(root: str | Path) -> dict:
         and p.relative_to(project).parts[1].lower().startswith("python")
     })
 
+    runtime_assessment = assess_runtime_profile(engine_version["version"], python_runtime_dirs)
+
     hints = []
+    if runtime_assessment["assessment"] == "candidate":
+        profile_id = runtime_assessment["candidates"][0]["profile_id"]
+        hints.append(f"Runtime profile candidate: {profile_id} (not a compatibility verdict).")
+    elif runtime_assessment["assessment"] == "ambiguous":
+        hints.append("Multiple bundled Python runtimes were found; runtime profile selection is ambiguous.")
+    elif runtime_assessment["assessment"] == "unmatched":
+        hints.append("Ren'Py 8 engine detected, but no inspected Python 3.11 Vita runtime profile matched the bundled runtime folders.")
     if archives:
         hints.append("RPA archives detected; inspect each archive before selecting an extraction strategy.")
     if videos:
@@ -175,6 +186,7 @@ def inspect_project(root: str | Path) -> dict:
         "audio_count": audio_count,
         "engine_directories": engine_dirs,
         "python_runtime_directories": python_runtime_dirs,
+        "runtime_profile_assessment": runtime_assessment,
         "vita_livearea": livearea_checks,
         "compatibility_hints": hints,
         "confidence": "inventory-plus-engine-fingerprint" if engine_version["version"] else "inventory-only",
