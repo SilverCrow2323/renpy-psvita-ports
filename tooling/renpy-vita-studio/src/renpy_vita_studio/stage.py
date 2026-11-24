@@ -78,6 +78,13 @@ def stage_project(
         raise StageError("title ID must be exactly 9 uppercase alphanumeric characters")
     if not source.is_dir():
         raise StageError(f"project directory does not exist: {source}")
+
+    app_root = target / "app" / title_id
+    if app_root.exists() or app_root.is_symlink():
+        raise StageError(f"destination already exists; refusing to overwrite: {app_root}")
+    if app_root in source.parents or source in app_root.parents:
+        raise StageError("source and destination overlap; choose a separate staging directory")
+
     game = source / "game"
     sce_sys = source / "sce_sys"
     if not game.is_dir():
@@ -98,12 +105,6 @@ def stage_project(
         candidate = sce_sys / name
         if candidate.is_file():
             optional_images[name] = _png_dimensions(candidate)
-
-    app_root = target / "app" / title_id
-    if app_root.exists():
-        raise StageError(f"destination already exists; refusing to overwrite: {app_root}")
-    if app_root in source.parents or source in app_root.parents:
-        raise StageError("source and destination overlap; choose a separate staging directory")
 
     app_root.parent.mkdir(parents=True, exist_ok=True)
     try:
