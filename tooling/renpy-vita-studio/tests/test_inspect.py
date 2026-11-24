@@ -70,6 +70,21 @@ class ProjectInspectionTests(unittest.TestCase):
             self.assertIsNone(report["renpy_version"])
             self.assertEqual(report["confidence"], "inventory-only")
 
+    def test_reports_runtime_profile_candidate_from_engine_and_python_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "game").mkdir()
+            (root / "lib" / "python3.11").mkdir(parents=True)
+            (root / "renpy").mkdir()
+            (root / "renpy" / "vc_version.py").write_text(
+                "version = '8.3.4'\n", encoding="utf-8"
+            )
+            report = inspect_project(root)
+            assessment = report["runtime_profile_assessment"]
+            self.assertEqual(assessment["assessment"], "candidate")
+            self.assertEqual(assessment["candidates"][0]["profile_id"], "grimiku-python311")
+            self.assertEqual(assessment["candidates"][0]["confidence"], "strong-indicator")
+
     def test_accepts_game_directory_as_input(self):
         with tempfile.TemporaryDirectory() as tmp:
             game = Path(tmp) / "game"
