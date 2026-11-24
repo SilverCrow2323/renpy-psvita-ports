@@ -51,7 +51,7 @@ def assess_runtime_profile(
 ) -> dict:
     """Return conservative candidates using bundled Python folders as evidence."""
     python_versions = sorted({
-        item.removeprefix("python")
+        item.lower().removeprefix("python")
         for item in python_runtime_directories
         if item.lower().startswith("python")
     })
@@ -64,7 +64,7 @@ def assess_runtime_profile(
 
     candidates = []
     if "2.7" in python_versions:
-        if engine_major == 8:
+        if engine_major is not None and engine_major >= 8:
             candidates.append({
                 "profile_id": "sonicmastr-python27",
                 "match": "conflicting-evidence",
@@ -83,7 +83,7 @@ def assess_runtime_profile(
             })
 
     if "3.11" in python_versions:
-        if engine_major is not None and engine_major < 8:
+        if engine_major is not None and engine_major != 8:
             candidates.append({
                 "profile_id": "grimiku-python311",
                 "match": "conflicting-evidence",
