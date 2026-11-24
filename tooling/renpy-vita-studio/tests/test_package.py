@@ -81,6 +81,13 @@ class VpkPackagingTests(unittest.TestCase):
                 build_vpk(app, output)
             self.assertEqual(output.read_bytes(), b"keep")
 
+    def test_requires_vpk_extension(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = make_staged_app(root)
+            with self.assertRaisesRegex(StageError, ".vpk extension"):
+                build_vpk(app, root / "output.zip")
+
     def test_requires_vitasdk_packer(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
