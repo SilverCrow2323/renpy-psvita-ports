@@ -12,6 +12,7 @@ from .inspect import inspect_project
 from .doctor import inspect_environment
 from .rpa import RpaError, extract_rpa, inspect_rpa
 from .stage import StageError, stage_project
+from .package import build_vpk
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -28,6 +29,10 @@ def _parser() -> argparse.ArgumentParser:
     stage.add_argument("project", type=Path, help="project root containing game/ and sce_sys/")
     stage.add_argument("destination", type=Path, help="new output directory; existing app/TITLE_ID is never overwritten")
     stage.add_argument("--title-id", required=True, help="9-character Vita title ID, e.g. PCSE00001")
+
+    package = sub.add_parser("vpk", help="package a staged app using VitaSDK's vita-pack-vpk")
+    package.add_argument("staged_app", type=Path, help="app/TITLE_ID directory containing eboot.bin and sce_sys/")
+    package.add_argument("output", type=Path, help="new .vpk output path; existing files are never overwritten")
 
     project = sub.add_parser("inspect", help="inventory a Ren'Py game project (read-only)")
     project.add_argument("path", type=Path)
@@ -57,6 +62,12 @@ def main(argv: list[str] | None = None) -> int:
             report = stage_project(args.project, args.destination, args.title_id)
             print(json.dumps(report, indent=2, ensure_ascii=False))
             print("Staging complete. This is not a VPK and has not been tested on a Vita.")
+            return 0
+
+        if args.command == "vpk":
+            report = build_vpk(args.staged_app, args.output)
+            print(json.dumps(report, indent=2, ensure_ascii=False))
+            print("VPK packaging complete. Installation and runtime have not been tested on a Vita.")
             return 0
 
         if args.command == "inspect":
