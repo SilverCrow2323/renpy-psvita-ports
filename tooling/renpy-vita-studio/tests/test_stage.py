@@ -44,6 +44,9 @@ def make_project(root: Path) -> Path:
     (sce_sys / "param.sfo").write_bytes(make_sfo())
     write_png(sce_sys / "icon0.png")
     write_png(sce_sys / "pic0.png", 960, 544)
+    livearea = sce_sys / "livearea" / "contents"
+    write_png(livearea / "bg.png", 960, 544)
+    (livearea / "template.xml").write_text("<livearea/>", encoding="utf-8")
     return project
 
 
@@ -60,7 +63,9 @@ class StagingTests(unittest.TestCase):
             self.assertEqual(manifest["title_id"], "PCSE00001")
             self.assertEqual(manifest["vita_metadata"]["icon0_png_dimensions"], [128, 128])
             self.assertEqual(manifest["vita_metadata"]["param_sfo_fields"]["TITLE_ID"], "PCSE00001")
-            self.assertEqual(result["file_count"], 4)
+            self.assertEqual(manifest["vita_metadata"]["optional_png_dimensions"]["livearea/contents/bg.png"], [960, 544])
+            self.assertTrue(manifest["vita_metadata"]["livearea_template_present"])
+            self.assertEqual(result["file_count"], 6)
             self.assertTrue(all(len(item["sha256"]) == 64 for item in manifest["files"]))
             self.assertTrue((project / "game" / "script.rpy").is_file())
 
