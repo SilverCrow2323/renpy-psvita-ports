@@ -145,6 +145,9 @@ def stage_project(
         raise StageError("sce_sys/param.sfo is required for Vita staging")
     if not (sce_sys / "icon0.png").is_file():
         raise StageError("sce_sys/icon0.png is required for Vita staging")
+    source_eboot = source / "eboot.bin"
+    if source_eboot.exists() and not source_eboot.is_file():
+        raise StageError("source eboot.bin exists but is not a regular file")
 
     _reject_symlinks(source)
     sfo_size, sfo_fields = _read_sfo(sce_sys / "param.sfo")
@@ -168,6 +171,8 @@ def stage_project(
     try:
         shutil.copytree(game, app_root / "game", symlinks=False)
         shutil.copytree(sce_sys, app_root / "sce_sys", symlinks=False)
+        if source_eboot.is_file():
+            shutil.copy2(source_eboot, app_root / "eboot.bin")
         files = _hash_files(app_root)
         manifest = {
             "format": "spdw-renpy-vita-stage-v1",
@@ -175,6 +180,7 @@ def stage_project(
             "source_project": str(source),
             "app_directory": str(app_root),
             "file_count": len(files),
+            "eboot_present": (app_root / "eboot.bin").is_file(),
             "total_bytes": sum(item["size"] for item in files),
             "vita_metadata": {
                 "param_sfo_bytes": sfo_size,
@@ -198,6 +204,7 @@ def stage_project(
             "app_directory": str(app_root),
             "manifest": str(manifest_path),
             "file_count": len(files),
+            "eboot_present": manifest["eboot_present"],
             "total_bytes": manifest["total_bytes"],
             "vita_metadata": manifest["vita_metadata"],
         }
