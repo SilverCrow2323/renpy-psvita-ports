@@ -9,6 +9,7 @@ from pathlib import Path
 
 from . import __version__
 from .inspect import inspect_project
+from .doctor import inspect_environment
 from .rpa import RpaError, extract_rpa, inspect_rpa
 
 
@@ -19,6 +20,8 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    sub.add_parser("doctor", help="check host tools and VitaSDK availability (read-only)")
 
     project = sub.add_parser("inspect", help="inventory a Ren'Py game project (read-only)")
     project.add_argument("path", type=Path)
@@ -39,6 +42,11 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        if args.command == "doctor":
+            report = inspect_environment()
+            print(json.dumps(report, indent=2, ensure_ascii=False))
+            return 0
+
         if args.command == "inspect":
             report = inspect_project(args.path)
             if args.json:
