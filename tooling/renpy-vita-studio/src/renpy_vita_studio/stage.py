@@ -1,0 +1,147 @@
+"""Non-destructive staging for a Vita app folder; this does not create a VPK."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import shutil
+import struct
+from pathlib import Path
+
+TITLE_ID_RE = re.compile(r"^[A-Z0-9]{9}$")
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+SFO_MAGIC = b"\x00PSF"
+
+
+class StageError(ValueError):
+    """Raised when a project is not safe or complete enough to stage."""
+
+
+def _png_dimensions(path: Path) -> tuple[int, int]:
+    try:
+        with path.open("rb") as stream:
+            header = stream.read(24)
+    except OSError as exc:
+        raise StageError(f"cannot read image {path}: {exc}") from exc
+    if len(header) < 24 or header[:8] != PNG_SIGNATURE or header[12:16] != b"IHDR":
+        raise StageError(f"{path} is not a valid PNG header")
+    width, height = struct.unpack(">II", header[16:24])
+    if width == 0 or height == 0:
+        raise StageError(f"{path} has invalid PNG dimensions")
+    return width, height
+
+
+def _validate_sfo(path: Path) -> int:
+    try:
+        size = path.stat().st_size
+        with path.open("rb") as stream:
+            magic = stream.read(4)
+    except OSError as exc:
+        raise StageError(f"cannot read {path}: {exc}") from exc
+    if size < 20 or magic != SFO_MAGIC:
+        raise StageError(f"{path} is missing a valid PSF magic/header")
+    return size
+
+
+def _reject_symlinks(root: Path) -> None:
+    for path in root.rglob("*"):
+        if path.is_symlink():
+            raise StageError(f"symbolic links are not allowed in staging input: {path}")
+
+
+def _hash_files(root: Path) -> list[dict]:
+    records = []
+    for path in sorted(p for p in root.rglob("*") if p.is_file()):
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        records.append({
+            "path": path.relative_to(root).as_posix(),
+            "size": path.stat().st_size,
+            "sha256": digest.hexdigest(),
+        })
+    return records
+
+
+def stage_project(
+    project_root: str | Path,
+    destination: str | Path,
+    title_id: str,
+) -> dict:
+    """Copy game/ and sce_sys/ into app/<TITLE_ID>, refusing overwrite."""
+    source = Path(project_root).expanduser().resolve()
+    target = Path(destination).expanduser().resolve()
+
+    if not TITLE_ID_RE.fullmatch(title_id):
+        raise StageError("title ID must be exactly 9 uppercase alphanumeric characters")
+    if not source.is_dir():
+        raise StageError(f"project directory does not exist: {source}")
+    game = source / "game"
+    sce_sys = source / "sce_sys"
+    if not game.is_dir():
+        raise StageError("project root must contain a game/ directory")
+    if not sce_sys.is_dir():
+        raise StageError("project root must contain sce_sys/")
+    if not (sce_sys / "param.sfo").is_file():
+        raise StageError("sce_sys/param.sfo is required for Vita staging")
+    if not (sce_sys / "icon0.png").is_file():
+        raise StageError("sce_sys/icon0.png is required for Vita staging")
+
+    _reject_symlinks(source)
+    sfo_size = _validate_sfo(sce_sys / "param.sfo")
+    icon_dimensions = _png_dimensions(sce_sys / "icon0.png")
+
+    optional_images = {}
+    for name in ("pic0.png", "pic1.png"):
+        candidate = sce_sys / name
+        if candidate.is_file():
+            optional_images[name] = _png_dimensions(candidate)
+
+    app_root = target / "app" / title_id
+    if app_root.exists():
+        raise StageError(f"destination already exists; refusing to overwrite: {app_root}")
+    if app_root in source.parents or source in app_root.parents:
+        raise StageError("source and destination overlap; choose a separate staging directory")
+
+    app_root.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        shutil.copytree(game, app_root / "game", symlinks=False)
+        shutil.copytree(sce_sys, app_root / "sce_sys", symlinks=False)
+        files = _hash_files(app_root)
+        manifest = {
+            "format": "spdw-renpy-vita-stage-v1",
+            "title_id": title_id,
+            "source_project": str(source),
+            "app_directory": str(app_root),
+            "file_count": len(files),
+            "total_bytes": sum(item["size"] for item in files),
+            "vita_metadata": {
+                "param_sfo_bytes": sfo_size,
+                "icon0_png_dimensions": list(icon_dimensions),
+                "optional_png_dimensions": optional_images,
+            },
+            "files": files,
+            "limitations": [
+                "Staging copies files; it does not build or sign a VPK.",
+                "param.sfo is checked for a PSF header only; its fields are not parsed or rewritten.",
+                "PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements.",
+                "A successful staging operation is not a runtime compatibility test.",
+            ],
+        }
+        manifest_path = app_root / "spdw-stage-manifest.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        return {
+            "title_id": title_id,
+            "app_directory": str(app_root),
+            "manifest": str(manifest_path),
+            "file_count": len(files),
+            "total_bytes": manifest["total_bytes"],
+            "vita_metadata": manifest["vita_metadata"],
+        }
+    except Exception:
+        # Only remove the newly-created target; never touch the supplied source.
+        if app_root.exists():
+            shutil.rmtree(app_root)
+        raise
