@@ -38,6 +38,7 @@ The project consolidates the old porting list and the four Sakura Succubus proje
 | How to suggest a title | [Suggestion guide](docs/SUGGESTING-A-GAME.md) |
 | How to report a test properly | [Testing checklist](docs/TESTING.md) |
 | Sakura Succubus 1–4 | [Unified series guide](docs/games/sakura-succubus/README.md) |
+| Community port installation guides | [Porting guides](docs/PORTING-GUIDES.md) |
 | Repository layout | [Structure guide](docs/REPOSITORY-STRUCTURE.md) |
 
 > **Website note:** the catalogue is being prepared under `docs/` for GitHub Pages. Until Pages is enabled in repository settings, the Markdown pages above are the canonical readable version.
