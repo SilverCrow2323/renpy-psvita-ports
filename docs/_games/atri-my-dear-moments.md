@@ -2,7 +2,7 @@
 title: "ATRI — My Dear Moments"
 issue: 21
 status: "Suggested · not evaluated"
-cover: "https://github.com/SilverCrow2323/Renpy-Vita-Portings/assets/61766903/d4f859c1-072c-4ebb-83a8-75c940937c05"
+cover: "https://cdn.akamai.steamstatic.com/steam/apps/1230140/header.jpg"
 summary: "The issue contains an image but no store link, edition, engine version or technical notes. The first task is to identify the exact release."
 ---
 
