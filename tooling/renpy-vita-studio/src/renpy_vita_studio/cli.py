@@ -13,6 +13,7 @@ from .doctor import inspect_environment
 from .rpa import RpaError, extract_rpa, inspect_rpa
 from .stage import StageError, stage_project
 from .package import build_vpk
+from .runtime_profiles import list_runtime_profiles
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -24,6 +25,7 @@ def _parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="check host tools and VitaSDK availability (read-only)")
+    sub.add_parser("profiles", help="list inspected Ren'Py Vita runtime reference profiles")
 
     stage = sub.add_parser("stage", help="prepare a non-destructive app/TITLE_ID staging folder")
     stage.add_argument("project", type=Path, help="project root containing game/ and sce_sys/")
@@ -56,6 +58,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "doctor":
             report = inspect_environment()
             print(json.dumps(report, indent=2, ensure_ascii=False))
+            return 0
+
+        if args.command == "profiles":
+            print(json.dumps(list_runtime_profiles(), indent=2, ensure_ascii=False))
             return 0
 
         if args.command == "stage":
