@@ -87,7 +87,7 @@ class StagingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             project = make_project(root)
-            (project / "sce_sys" / "param.sfo").write_bytes(b"not-a-psf-file" + b"\\x00" * 20)
+            (project / "sce_sys" / "param.sfo").write_bytes(b"not-a-psf-file" + b"\x00" * 20)
             with self.assertRaisesRegex(StageError, "PSF magic"):
                 stage_project(project, root / "out", "PCSE00001")
 
