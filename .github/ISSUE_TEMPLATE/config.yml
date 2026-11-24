@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Ren'Py Vita Hub documentation
+    url: https://github.com/SilverCrow2323/renpy-psvita-ports/tree/main/docs
+    about: Read compatibility notes, the catalogue and testing guidance before opening an issue.
+  - name: 🗂️ Existing game proposals
+    url: https://github.com/SilverCrow2323/renpy-psvita-ports/issues
+    about: Check whether the title or problem has already been reported.
