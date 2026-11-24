@@ -16,7 +16,7 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 - Read-only \`doctor\` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.
 - **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, parses bounded PSF metadata, checks that `TITLE_ID` matches the requested ID and checks PNG headers/dimensions, reports LiveArea assets, rejects symlinks and refuses to overwrite an existing target.
 - Carries through an optional runtime-built `eboot.bin` and writes a SHA-256 manifest for the staged payload.
-- **VPK packaging preview:** invokes VitaSDK `vita-pack-vpk` without a shell, refuses overwrite, and verifies the resulting ZIP/VPK contains the expected files.
+- **VPK packaging preview:** invokes VitaSDK `vita-pack-vpk` without a shell, refuses overwrite, and checks the VPK CRC and verifies the expected archive entries.
 
 ## Requirements
 
