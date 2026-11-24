@@ -145,6 +145,8 @@ def inspect_project(root: str | Path) -> dict:
         hints.append(f"Runtime profile candidate: {profile_id} (not a compatibility verdict).")
     elif runtime_assessment["assessment"] == "ambiguous":
         hints.append("Multiple bundled Python runtimes were found; runtime profile selection is ambiguous.")
+    elif runtime_assessment["assessment"] == "conflict":
+        hints.append("Engine and bundled Python runtime evidence conflict; do not select a runtime adapter automatically.")
     elif runtime_assessment["assessment"] == "unmatched":
         hints.append("Ren'Py 8 engine detected, but no inspected Python 3.11 Vita runtime profile matched the bundled runtime folders.")
     if archives:
