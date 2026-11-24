@@ -4,7 +4,7 @@
 
 - Added conservative Ren'Py engine fingerprinting from generated `renpy/vc_version.py` metadata (high confidence) and legacy literal `version_tuple` metadata (medium confidence).
 - Kept the game version (`config.version`) separate from the engine version; unknown fingerprints remain unknown.
-- Added tests for modern, legacy and ambiguous-version cases.
+- Added tests for modern, legacy and ambiguous-version cases.\n- Added a read-only `doctor` command that reports host details and discovers common build/VitaSDK tools without executing them.\n- Added tests for missing and partially configured VitaSDK environments.
 
 ## 0.1.0 — Core preview
 
