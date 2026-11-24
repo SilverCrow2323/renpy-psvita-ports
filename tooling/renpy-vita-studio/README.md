@@ -34,6 +34,7 @@ python -m venv .venv
 python -m pip install -e .
 renpy-vita-studio --help
 renpy-vita-studio doctor
+renpy-vita-studio profiles
 \`\`\`
 
 ## Examples
@@ -41,6 +42,9 @@ renpy-vita-studio doctor
 \`\`\`sh
 # Inventory a project
 renpy-vita-studio inspect "/path/to/Game" --json
+
+# Compare detected runtime evidence with the reference profiles
+renpy-vita-studio profiles
 
 # Inspect/extract a standard archive
 renpy-vita-studio rpa list "/path/to/Game/game/archive.rpa" --json
@@ -82,7 +86,7 @@ The native runtime baseline is [SonicMastr/renpy-vita](https://github.com/SonicM
 
 1. Broaden archive fixtures and engine/runtime fingerprint coverage.
 2. Expand LiveArea asset dimension checks and validate title metadata against runtime profiles.
-3. Add explicit profile adapters for supported Vita runtimes.
+3. Turn the current reference profiles into audited runtime adapters with pinned dependencies and reproducible build scripts.
 4. Extend the VPK wrapper with reproducible build manifests and runtime build integration.
 5. Desktop GUI and optional USB/network device integration.
 6. Evaluate a Vita-side companion only for tasks that fit Vita memory and native APIs.
