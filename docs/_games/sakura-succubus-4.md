@@ -34,7 +34,7 @@ The legacy README reports occasional Settings and Load/Save menu glitches, with 
 
 ## Installation and compatibility
 
-See the [unified Sakura Succubus installation guide](../games/sakura-succubus/README.md) for the shared workflow and title-specific content path.
+See the [unified Sakura Succubus installation guide](https://github.com/SilverCrow2323/renpy-psvita-ports/blob/main/docs/games/sakura-succubus/README.md) for the shared workflow and title-specific content path.
 
 ## Test status
 
