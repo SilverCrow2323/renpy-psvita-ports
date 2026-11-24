@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 import zipfile
@@ -20,7 +21,7 @@ def build_vpk(staged_app: str | Path, output: str | Path) -> dict:
     if not app.is_dir():
         raise StageError(f"staged app directory does not exist: {app}")
     title_id = app.name
-    if len(title_id) != 9 or not title_id.isalnum() or title_id.upper() != title_id:
+    if not re.fullmatch(r"[A-Z0-9]{9}", title_id):
         raise StageError("staged app folder must be named with its 9-character uppercase title ID")
     if target.suffix.lower() != ".vpk":
         raise StageError("output filename must use the .vpk extension")
