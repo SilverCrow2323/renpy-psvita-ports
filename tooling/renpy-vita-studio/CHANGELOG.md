@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added conservative Ren'Py engine fingerprinting from generated `renpy/vc_version.py` metadata (high confidence) and legacy literal `version_tuple` metadata (medium confidence).
+- Kept the game version (`config.version`) separate from the engine version; unknown fingerprints remain unknown.
+- Added tests for modern, legacy and ambiguous-version cases.
+
 ## 0.1.0 — Core preview
 
 - Added read-only Ren'Py project inventory.
