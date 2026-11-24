@@ -4,7 +4,7 @@
 
 A cautious inspection and preparation core for user-supplied Ren'Py projects targeting PlayStation Vita.
 
-> **Alpha foundation, not a one-click port converter.** This tool inventories projects, reads standard RPA-2.0 / RPA-3.0 archives and prepares a non-destructive Vita app staging folder. It does not patch games, run Ren'Py, build VPKs or promise compatibility.
+> **Alpha foundation, not a one-click port converter.** This tool inventories projects, reads standard RPA-2.0 / RPA-3.0 archives and prepares a non-destructive Vita app staging folder. It does not patch games, build or adapt a Ren'Py runtime, or promise compatibility. It can package an already-built Vita `eboot.bin` when VitaSDK's VPK tool is available.
 
 ## Current capabilities
 
@@ -83,6 +83,6 @@ The native runtime baseline is [SonicMastr/renpy-vita](https://github.com/SonicM
 1. Broaden archive fixtures and engine/runtime fingerprint coverage.
 2. Expand LiveArea asset dimension checks and validate title metadata against runtime profiles.
 3. Add explicit profile adapters for supported Vita runtimes.
-4. Build a reproducible VitaSDK-backed VPK packager.
+4. Extend the VPK wrapper with reproducible build manifests and runtime build integration.
 5. Desktop GUI and optional USB/network device integration.
 6. Evaluate a Vita-side companion only for tasks that fit Vita memory and native APIs.
