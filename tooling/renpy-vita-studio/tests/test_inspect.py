@@ -27,6 +27,49 @@ class ProjectInspectionTests(unittest.TestCase):
             self.assertIn("video playback", " ".join(report["compatibility_hints"]).lower())
             self.assertFalse(report["vita_livearea"]["param_sfo"])
 
+    def test_detects_modern_engine_version_from_vc_version(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "game").mkdir()
+            engine = root / "renpy"
+            engine.mkdir()
+            (engine / "vc_version.py").write_text(
+                "version = '8.3.4.25010101'\\nversion_name = 'Test'\\n",
+                encoding="utf-8",
+            )
+            report = inspect_project(root)
+            self.assertEqual(report["renpy_version"], "8.3.4.25010101")
+            self.assertEqual(report["renpy_version_detection"]["confidence"], "high")
+            self.assertIn("vc_version.py", report["renpy_version_detection"]["source"])
+
+    def test_detects_legacy_engine_tuple_without_executing_code(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            game = root / "game"
+            game.mkdir()
+            engine = root / "renpy"
+            engine.mkdir()
+            (engine / "__init__.py").write_text(
+                "version_tuple = (6, 99, 11, vc_version)\\n",
+                encoding="utf-8",
+            )
+            report = inspect_project(root)
+            self.assertEqual(report["renpy_version"], "6.99.11")
+            self.assertEqual(report["renpy_version_detection"]["confidence"], "medium")
+
+    def test_does_not_treat_game_version_as_engine_version(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            game = root / "game"
+            game.mkdir()
+            (game / "options.rpy").write_text(
+                'define config.version = "8.2.0"\\n', encoding="utf-8"
+            )
+            report = inspect_project(root)
+            self.assertEqual(report["game_version"], "8.2.0")
+            self.assertIsNone(report["renpy_version"])
+            self.assertEqual(report["confidence"], "inventory-only")
+
     def test_accepts_game_directory_as_input(self):
         with tempfile.TemporaryDirectory() as tmp:
             game = Path(tmp) / "game"
