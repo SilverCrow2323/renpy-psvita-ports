@@ -175,7 +175,8 @@ def stage_project(
             "file_count": len(files),
             "total_bytes": sum(item["size"] for item in files),
             "vita_metadata": {
-                "param_sfo_bytes": sfo_size,\n                "param_sfo_fields": {key: sfo_fields[key] for key in ("TITLE", "TITLE_ID", "APP_VER", "CATEGORY") if key in sfo_fields},
+                "param_sfo_bytes": sfo_size,
+                "param_sfo_fields": {key: sfo_fields[key] for key in ("TITLE", "TITLE_ID", "APP_VER", "CATEGORY") if key in sfo_fields},
                 "icon0_png_dimensions": list(icon_dimensions),
                 "optional_png_dimensions": optional_images,
             },
