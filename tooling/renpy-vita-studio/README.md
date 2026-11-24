@@ -15,7 +15,8 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 - Uses a restricted pickle unpickler, bounded decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
 - Read-only \`doctor\` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.
 - **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, parses bounded PSF metadata, checks that `TITLE_ID` matches the requested ID and checks PNG headers/dimensions, reports LiveArea assets, rejects symlinks and refuses to overwrite an existing target.
-- Writes a SHA-256 manifest for the staged payload.
+- Carries through an optional runtime-built `eboot.bin` and writes a SHA-256 manifest for the staged payload.
+- **VPK packaging preview:** invokes VitaSDK `vita-pack-vpk` without a shell, refuses overwrite, and verifies the resulting ZIP/VPK contains the expected files.
 
 ## Requirements
 
@@ -45,8 +46,11 @@ renpy-vita-studio inspect "/path/to/Game" --json
 renpy-vita-studio rpa list "/path/to/Game/game/archive.rpa" --json
 renpy-vita-studio rpa extract "/path/to/Game/game/archive.rpa" "./rpa-extract"
 
-# Prepare a Vita app folder (does not create a VPK)
+# Prepare a Vita app folder (copies eboot.bin too if the runtime build supplied it)
 renpy-vita-studio stage "/path/to/Game" "./vita-output" --title-id PCSE00001
+
+# Package only after a compatible runtime has produced eboot.bin
+renpy-vita-studio vpk "./vita-output/app/PCSE00001" "./release/Game.vpk"
 \`\`\`
 
 The staging command expects a project root containing both \`game/\` and \`sce_sys/\`, including \`sce_sys/param.sfo\` and \`sce_sys/icon0.png\`. It creates \`vita-output/app/PCSE00001/\`. Supply the correct title ID and metadata yourself; the tool does not invent or rewrite them.
@@ -62,7 +66,7 @@ The staging command expects a project root containing both \`game/\` and \`sce_s
 - PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements. LiveArea assets are reported, not checked against a device-specific artwork profile.
 - The manifest hashes staged payload files; it is not a signature or compatibility certificate.
 - No DRM bypass, decryption, game-data redistribution or proprietary payload bundling.
-- No VPK generation, signing or Vita installation is implemented yet.
+- The `vpk` command only wraps an already-built `eboot.bin` with VitaSDK's `vita-pack-vpk`; it does not compile or adapt the Ren'Py runtime, sign binaries, install the package or validate execution on a Vita.
 
 ## Development
 
