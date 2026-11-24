@@ -1,28 +1,28 @@
-# Ren'Py Vita — porting hub
+# Ren'Py Vita Hub
 
-This repository tracks candidate Ren'Py visual novels and the status of porting tests for PlayStation Vita using [renpy-vita](https://github.com/SonicMastr/renpy-vita). It is an index and coordination project, not a game installer.
+The central catalogue and documentation home for Ren'Py visual-novel ports targeting PlayStation Vita with [SonicMastr's Ren'Py Vita runtime](https://github.com/SonicMastr/renpy-vita).
 
 > [!IMPORTANT]
-> **MUST KNOW!!** The project README says candidate games should be basic and that videos are not supported by the current porting path. A game being listed here does not mean it has been tested or successfully ported.
+> A catalogue entry is not a compatibility guarantee. Suggestions, active tests, available project repositories and historical failures are separate statuses. Read the evidence before treating a title as playable.
 
 ## Start here
 
-- [Compatibility limits](Compatibility-Limits)
+- [Main catalogue and available ports](https://github.com/SilverCrow2323/Renpy-Vita-Portings#available-renpy-vita-ports)
+- [Compatibility guide](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/COMPATIBILITY.md)
 - [Port status](Port-Status)
+- [Testing checklist](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/TESTING.md)
 - [Suggest a game](Game-Suggestions)
-- [Testing checklist](Testing-Checklist)
-- [FAQ](FAQ)
 
-## Related ports
+## Sakura Succubus series
 
-- [Available Ren'Py Vita ports](https://github.com/SilverCrow2323/Renpy-Vita-Portings#available-renpy-vita-ports)
-- [Ren'Py Vita engine](https://github.com/SonicMastr/renpy-vita)
-- [Project issues](https://github.com/SilverCrow2323/Renpy-Vita-Portings/issues)
+The four Sakura Succubus Vita ports are documented as one series:
 
-## Important distinction
+- [Unified series installation guide](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/games/sakura-succubus/README.md)
+- [Sakura Succubus](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/games/sakura-succubus/1.md)
+- [Sakura Succubus 2](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/games/sakura-succubus/2.md)
+- [Sakura Succubus 3](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/games/sakura-succubus/3.md)
+- [Sakura Succubus 4](https://github.com/SilverCrow2323/Renpy-Vita-Portings/blob/main/docs/games/sakura-succubus/4.md)
 
-- **Candidate** means a game has been suggested for a future test.
-- **Testing** means a porting attempt is currently being evaluated.
-- **Available port** means a separate project repository exists.
-- **Failed basic conversion** means the unpatched base conversion did not complete the documented test path.
+## Project boundaries
 
+This repository is a catalogue and documentation hub, not a game installer. It does not distribute commercial game data, proprietary assets or VPK binaries. The original game must be obtained from its rights holder.

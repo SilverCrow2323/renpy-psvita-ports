@@ -1,38 +1,28 @@
 # Port status
 
-This page summarizes the status categories used by the project README. The README remains the canonical list of individual titles; update both when a test result changes.
+The main [Ren'Py Vita Hub catalogue](https://github.com/SilverCrow2323/Renpy-Vita-Portings#available-renpy-vita-ports) is the canonical list of titles. This page explains how to read its status.
 
-## In testing
+| Label | Meaning |
+|---|---|
+| Suggested | A community member proposed the title; no test is implied. |
+| Queued | Accepted for evaluation, but no test is underway. |
+| Testing | A conversion or runtime test is actively being evaluated. |
+| Boots | The app launches to a usable initial screen. |
+| Session-tested | Meaningful gameplay has been exercised. |
+| Playable | A substantial playthrough works with limitations disclosed. |
+| Available port | A separate project repository or release exists; no recent retest is implied. |
+| Blocked | A specific blocker prevents progress. |
+| Failed basic conversion | The unpatched baseline conversion failed at a recorded stage. |
 
-The README currently lists:
+## Historical basic-conversion failures
 
-- Maid Mansion
-- Harvest December: Reharvested
+The old list recorded runtime/session errors for Sakura Dungeon and Milk Outside a Bag of Milk Outside a Bag of Milk, and boot failures for Toketsu, Analogue — A Hate Story, Strike The Light, Hate Plus, Long Live the Queen, Over The Hills And Far Away and Katawa Shoujo.
 
-## Future tests and suggestions
+These are historical observations, not current regression-test results. A different game build, runtime revision or patch may change the outcome.
 
-The candidate list includes visual novels and other Ren'Py projects. A listing means **proposed for evaluation**, not tested or confirmed compatible.
+## Reporting rules
 
-Examples currently listed in the README include Sakura Sadist, Legends of Talia: Arcadia, Fatal Twelve, Coffee Talk!, Chemically Bonded, Stillwater and The Language of Love.
-
-## Failed basic conversions
-
-The README separates two failure types:
-
-- **Ren'Py errors during a game session:** examples include Sakura Dungeon and Milk Outside a Bag of Milk Outside a Bag of Milk.
-- **Doesn't boot:** examples include Toketsu, Analogue - A Hate Story, Strike The Light, Hate Plus, Long Live the Queen, Over The Hills And Far Away and Katawa Shoujo.
-
-These results refer to basic Ren'Py-Vita conversions without further patches.
-
-## Available port repositories
-
-The root README links separate projects including:
-
-- [(Don't) Open Your Eyes Vita](https://github.com/SilverCrow2323/Don-t-OpenYourVita)
-- [Sakura Succubus Vita](https://github.com/SilverCrow2323/Sakura-Succubus-Vita)
-- [Sakura Succubus 2 Vita](https://github.com/SilverCrow2323/Sakura-Succubus-2-Vita)
-- [Sakura Succubus 3 Vita](https://github.com/SilverCrow2323/Sakura-Succubus-3-Vita)
-- [Sakura Succubus 4 Vita](https://github.com/SilverCrow2323/Sakura-Succubus-4-Vita)
-- [Magical Literary Heroine Natsuki Saves The Literature Club! Vita](https://github.com/SilverCrow2323/Magical-Literary-Heroine-Natsuki-Saves-The-Literature-Club-Vita)
-- [HIKE BACK Vita](https://github.com/SilverCrow2323/HIKE-BACK-Vita)
-
+- Booting is not the same as being playable.
+- Emulator or CI success is not physical Vita validation.
+- Keep baseline and patched conversion results separate.
+- Record game version, runtime revision, platform, Vita model/firmware and test date when known.
