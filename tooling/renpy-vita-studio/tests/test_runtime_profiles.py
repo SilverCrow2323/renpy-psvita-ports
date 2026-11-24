@@ -23,6 +23,11 @@ class RuntimeProfileTests(unittest.TestCase):
         self.assertEqual(report["assessment"], "conflict")
         self.assertEqual(report["candidates"][0]["match"], "conflicting-evidence")
 
+    def test_older_engine_with_python311_is_conflicting(self):
+        report = assess_runtime_profile("7.4.11", ["python3.11"])
+        self.assertEqual(report["assessment"], "conflict")
+        self.assertEqual(report["candidates"][0]["match"], "conflicting-evidence")
+
     def test_mixed_python_runtimes_are_ambiguous(self):
         report = assess_runtime_profile(None, ["python2.7", "python3.11"])
         self.assertEqual(report["assessment"], "ambiguous")
