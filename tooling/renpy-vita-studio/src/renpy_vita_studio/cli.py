@@ -11,6 +11,7 @@ from . import __version__
 from .inspect import inspect_project
 from .doctor import inspect_environment
 from .rpa import RpaError, extract_rpa, inspect_rpa
+from .stage import StageError, stage_project
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -22,6 +23,11 @@ def _parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="check host tools and VitaSDK availability (read-only)")
+
+    stage = sub.add_parser("stage", help="prepare a non-destructive app/TITLE_ID staging folder")
+    stage.add_argument("project", type=Path, help="project root containing game/ and sce_sys/")
+    stage.add_argument("destination", type=Path, help="new output directory; existing app/TITLE_ID is never overwritten")
+    stage.add_argument("--title-id", required=True, help="9-character Vita title ID, e.g. PCSE00001")
 
     project = sub.add_parser("inspect", help="inventory a Ren'Py game project (read-only)")
     project.add_argument("path", type=Path)
@@ -45,6 +51,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "doctor":
             report = inspect_environment()
             print(json.dumps(report, indent=2, ensure_ascii=False))
+            return 0
+
+        if args.command == "stage":
+            report = stage_project(args.project, args.destination, args.title_id)
+            print(json.dumps(report, indent=2, ensure_ascii=False))
+            print("Staging complete. This is not a VPK and has not been tested on a Vita.")
             return 0
 
         if args.command == "inspect":
@@ -81,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         written = extract_rpa(archive, args.destination, max_total_bytes=limit)
         print(f"Extracted {archive.file_count} files ({written:,} bytes) to {args.destination}")
         return 0
-    except (OSError, ValueError, RpaError) as exc:
+    except (OSError, ValueError, RpaError, StageError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
