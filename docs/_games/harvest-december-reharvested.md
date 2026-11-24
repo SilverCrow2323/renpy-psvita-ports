@@ -3,6 +3,7 @@ title: "Harvest December: Reharvested Portable"
 issue: 0
 status: "Porting project · status requires fresh confirmation"
 official: "https://natirivers.itch.io/harvest-december-remake"
+cover: "https://raw.githubusercontent.com/SilverCrow2323/Harvest-December-Reharvested-Portable/main/PSVITA%20Port/sce_sys/pic0.png"
 community_port: "https://github.com/SilverCrow2323/Harvest-December-Reharvested-Portable"
 summary: "A Ren'Py adaptation of Harvest December: Reharvested for PS Vita (and originally planned for Switch), based on the PC remake. The project README credits Autumn Rivers and takoyaki99; its current build and completion status need confirmation."
 ---
