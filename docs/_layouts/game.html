@@ -1,0 +1,19 @@
+---
+layout: default
+---
+<article class="game-sheet">
+  <header class="game-hero">
+    <p><a href="{{ '/catalogue/' | relative_url }}">← Back to catalogue</a></p>
+    <h1>{{ page.title | escape }}</h1>
+    <p><strong>Status:</strong> {{ page.status | default: "Suggested · not evaluated" }}</p>
+    {% if page.cover %}
+      <img src="{{ page.cover | escape }}" alt="Cover artwork for {{ page.title | escape }}" style="max-width: 320px; width: 100%; height: auto;">
+    {% else %}
+      <p><em>No verified cover image supplied yet.</em></p>
+    {% endif %}
+  </header>
+  {{ content }}
+  <hr>
+  <p><strong>Source record:</strong> <a href="https://github.com/SilverCrow2323/renpy-psvita-ports/issues/{{ page.issue }}">Issue #{{ page.issue }}</a></p>
+  <p><small>Catalogue entries are research records, not a promise that a game runs on Vita. Compatibility requires a reproducible test of an identified game build.</small></p>
+</article>
