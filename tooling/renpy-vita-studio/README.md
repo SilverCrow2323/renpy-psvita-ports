@@ -11,7 +11,7 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 ## Current capabilities
 
 - Read-only project inventory: `game/`, scripts, RPA archives, media, native libraries, Python runtime directories and Vita LiveArea assets.
-- Extracts conservative metadata from `game/options.rpy` without executing the script.
+- Extracts conservative metadata from `game/options.rpy` without executing the script. The game version is kept separate from the Ren'Py engine version.\n- Fingerprints the engine from literal metadata in `renpy/vc_version.py` (high confidence) or a legacy literal `version_tuple` in `renpy/__init__.py` (medium confidence). Unknown versions stay unknown; bundled Python folders are supporting evidence, not a version verdict.
 - Detects video and native library files as compatibility hints.
 - Lists and extracts standard RPA-2.0 and RPA-3.0 archives.
 - Uses a restricted pickle unpickler, bounded index decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
@@ -51,7 +51,7 @@ The extractor refuses to overwrite an existing destination. Choose a new empty p
 - Custom/encrypted archive variants and RPA-1.0 / standalone RPI are not supported.
 - RPYC files are inventoried but never unpickled or decompiled.
 - The inspector does not execute `options.rpy` or other game code.
-- The current report does not infer a Ren'Py version from weak fingerprints.
+- Engine version detection is deliberately limited to supported literal fingerprints; a missing or ambiguous fingerprint remains unknown.
 - No DRM bypass, decryption, game-data redistribution or proprietary payload bundling.
 - No VPK generation or Vita installation is implemented yet.
 
