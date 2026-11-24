@@ -14,6 +14,7 @@ A community catalogue for Ren'Py visual novels and games being evaluated, adapte
 ## Explore
 
 - [Browse every title]({{ '/catalogue/' | relative_url }})
+- [Community port installation guides](https://github.com/SilverCrow2323/renpy-psvita-ports/blob/main/docs/PORTING-GUIDES.md)
 - [Compatibility guide](https://github.com/SilverCrow2323/renpy-psvita-ports/blob/main/docs/COMPATIBILITY.md)
 - [Testing checklist](https://github.com/SilverCrow2323/renpy-psvita-ports/blob/main/docs/TESTING.md)
 - [Suggest a title](https://github.com/SilverCrow2323/renpy-psvita-ports/issues/new?template=ren-py-game.md)
