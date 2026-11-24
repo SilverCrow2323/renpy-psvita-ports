@@ -72,6 +72,14 @@ The staging command expects a project root containing both \`game/\` and \`sce_s
 - No DRM bypass, decryption, game-data redistribution or proprietary payload bundling.
 - The `vpk` command only wraps an already-built `eboot.bin` with VitaSDK's `vita-pack-vpk`; it does not compile or adapt the Ren'Py runtime, sign binaries, install the package or validate execution on a Vita.
 
+## Runtime build plans
+
+Studio includes a non-executing build-plan generator for the two reference runtimes. Run `renpy-vita-studio build-plan` to compare both checklists, or pass `--profile sonicmastr-python27` / `--profile grimiku-python311` to inspect one.
+
+The legacy profile calls out Python 2.7.18, VitaSDK, Cython (the public README does not state an exact pin), PVR_PSP2 assets and SDL2 with `VIDEO_VITA_PVR=ON`. The Ren'Py 8 profile calls out Python 3.11, Cython 0.29.37 (not 3.x), rsync, 7-Zip, OpenSSL 1.1.1 integration, Vita-specific CPython changes and the HarfBuzz-enabled FreeType requirement.
+
+These plans are checklists, not lockfiles or reproducible-build claims. They never run upstream scripts, download mutable dependencies or modify the host SDK. Audit upstream revisions and licensing before running any build manually.
+
 ## Development
 
 \`\`\`sh
