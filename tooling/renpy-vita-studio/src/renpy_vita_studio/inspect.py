@@ -8,15 +8,68 @@ from pathlib import Path
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".ogv", ".ogg", ".mkv", ".avi", ".mov", ".mpeg", ".mpg"}
 NATIVE_EXTENSIONS = {".so", ".dll", ".pyd", ".dylib"}
 MAX_OPTIONS_BYTES = 2 * 1024 * 1024
+MAX_FINGERPRINT_BYTES = 512 * 1024
 
 
-def _read_options(path: Path) -> str:
+def _read_text(path: Path, limit: int) -> str:
     try:
-        if path.stat().st_size > MAX_OPTIONS_BYTES:
+        if path.stat().st_size > limit:
             return ""
         return path.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return ""
+
+
+def _read_options(path: Path) -> str:
+    return _read_text(path, MAX_OPTIONS_BYTES)
+
+
+def _detect_engine_version(project: Path) -> dict:
+    """Read version literals from engine-owned files; never execute project code."""
+    roots = [project / "renpy"]
+    if project.name.lower() == "game":
+        roots.append(project.parent / "renpy")
+
+    for engine_root in roots:
+        if not engine_root.is_dir():
+            continue
+
+        # Modern Ren'Py writes the generated version literal here.
+        vc_version = _read_text(engine_root / "vc_version.py", MAX_FINGERPRINT_BYTES)
+        match = re.search(
+            r"""^\s*version\s*=\s*["'](\d+\.\d+\.\d+(?:\.\d+)?(?:[-+][\w.-]+)?)["']""",
+            vc_version,
+            re.MULTILINE,
+        )
+        if match:
+            return {
+                "version": match.group(1),
+                "confidence": "high",
+                "source": (engine_root / "vc_version.py").as_posix(),
+                "evidence": "literal version assignment in Ren'Py's generated vc_version.py",
+            }
+
+        # Older releases embedded a literal tuple in renpy/__init__.py.
+        init_text = _read_text(engine_root / "__init__.py", MAX_FINGERPRINT_BYTES)
+        tuple_match = re.search(
+            r"^\s*version_tuple\s*=\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)",
+            init_text,
+            re.MULTILINE,
+        )
+        if tuple_match:
+            return {
+                "version": ".".join(tuple_match.groups()),
+                "confidence": "medium",
+                "source": (engine_root / "__init__.py").as_posix(),
+                "evidence": "literal major/minor/patch tuple in Ren'Py's engine package",
+            }
+
+    return {
+        "version": None,
+        "confidence": "none",
+        "source": None,
+        "evidence": "no supported engine version literal found",
+    }
 
 
 def inspect_project(root: str | Path) -> dict:
@@ -50,6 +103,7 @@ def inspect_project(root: str | Path) -> dict:
     version_match = re.search(r"""(?:define\s+)?config\.version\s*=\s*["']([^"']+)["']""", options)
     name_match = re.search(r"""(?:define\s+)?config\.name\s*=\s*["']([^"']+)["']""", options)
 
+    engine_version = _detect_engine_version(project)
     archives = [p for p in files if p.suffix.lower() == ".rpa"]
     scripts = [p for p in files if p.suffix.lower() in {".rpy", ".rpyc", ".rpym", ".rpymc"}]
     videos = [p for p in files if p.suffix.lower() in VIDEO_EXTENSIONS]
@@ -58,6 +112,8 @@ def inspect_project(root: str | Path) -> dict:
     audio_count = sum(1 for p in files if p.suffix.lower() in {".ogg", ".opus", ".mp3", ".wav", ".flac"})
 
     livearea = project / "sce_sys"
+    if project.name.lower() == "game":
+        livearea = project.parent / "sce_sys"
     livearea_checks = {
         "sce_sys_present": livearea.is_dir(),
         "icon0": (livearea / "icon0.png").is_file(),
@@ -69,6 +125,8 @@ def inspect_project(root: str | Path) -> dict:
     }
 
     engine_dirs = [name for name in ("renpy", "lib", "common") if (project / name).is_dir()]
+    if project.name.lower() == "game" and (project.parent / "renpy").is_dir() and "renpy" not in engine_dirs:
+        engine_dirs.append("renpy")
     python_runtime_dirs = sorted({
         p.relative_to(project).parts[1]
         for p in files
@@ -90,16 +148,23 @@ def inspect_project(root: str | Path) -> dict:
         hints.append("No sce_sys/ directory found; Vita LiveArea metadata/assets still need to be prepared.")
     if not livearea_checks["param_sfo"]:
         hints.append("No param.sfo found; this scan does not generate Vita metadata.")
-    if not version_match:
-        hints.append("Ren'Py version was not identified from game/options.rpy; treat engine version as unknown.")
+    if engine_version["version"] is None:
+        hints.append("Ren'Py engine version is unknown: no supported literal fingerprint was found.")
+    else:
+        hints.append(
+            f"Ren'Py engine fingerprint: {engine_version['version']} "
+            f"({engine_version['confidence']} confidence; {engine_version['source']})."
+        )
+    if python_runtime_dirs:
+        hints.append("Bundled Python runtime directories detected; these identify packaged runtimes, not by themselves the Ren'Py engine version.")
 
     return {
         "project_root": str(project),
         "game_directory": str(game_dir),
         "title": name_match.group(1) if name_match else project.name,
         "game_version": version_match.group(1) if version_match else None,
-        "renpy_version": None,
-        "renpy_version_detection": "not implemented; requires engine/runtime fingerprints",
+        "renpy_version": engine_version["version"],
+        "renpy_version_detection": engine_version,
         "file_count": len(files),
         "total_bytes": total_bytes,
         "rpa_archives": [p.relative_to(project).as_posix() for p in archives],
@@ -112,10 +177,10 @@ def inspect_project(root: str | Path) -> dict:
         "python_runtime_directories": python_runtime_dirs,
         "vita_livearea": livearea_checks,
         "compatibility_hints": hints,
-        "confidence": "inventory-only",
+        "confidence": "inventory-plus-engine-fingerprint" if engine_version["version"] else "inventory-only",
         "limitations": [
             "A file inventory is not a compatibility test.",
             "This version does not parse RPYC scripts, decrypt custom archives, patch games or build VPK files.",
-            "Ren'Py engine version detection is intentionally not guessed.",
+            "Engine fingerprints are read from literal metadata only; unknown versions remain unknown.",
         ],
     }
