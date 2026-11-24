@@ -19,7 +19,7 @@ class EnvironmentDoctorTests(unittest.TestCase):
         self.assertTrue(any("does not run compilers" in note for note in report["notes"]))
 
     def test_reports_core_toolchain_components_without_claiming_full_readiness(self):
-        required = {"arm-vita-eabi-gcc", "arm-vita-eabi-g++", "vita-pack-vpk", "vita-mksfoex"}
+        required = {"arm-vita-eabi-gcc", "arm-vita-eabi-g++", "vita-pack-vpk", "vita-mksfoex", "cmake", "make"}
         with tempfile.TemporaryDirectory() as tmp, patch.dict(
             os.environ, {"VITASDK": tmp}, clear=True
         ), patch(
