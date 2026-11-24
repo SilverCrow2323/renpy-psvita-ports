@@ -64,38 +64,52 @@ def assess_runtime_profile(
 
     candidates = []
     if "2.7" in python_versions:
-        candidates.append({
-            "profile_id": "sonicmastr-python27",
-            "match": "candidate",
-            "confidence": "medium",
-            "evidence": ["bundled lib/python2.7 runtime directory"],
-        })
-    if "3.11" in python_versions:
-        candidates.append({
-            "profile_id": "grimiku-python311",
-            "match": "candidate",
-            "confidence": "medium",
-            "evidence": ["bundled lib/python3.11 runtime directory"],
-        })
+        if engine_major == 8:
+            candidates.append({
+                "profile_id": "sonicmastr-python27",
+                "match": "conflicting-evidence",
+                "confidence": "low",
+                "evidence": [
+                    "bundled lib/python2.7 runtime directory",
+                    f"Ren'Py engine fingerprint {engine_version} is in the Ren'Py 8 generation",
+                ],
+            })
+        else:
+            candidates.append({
+                "profile_id": "sonicmastr-python27",
+                "match": "candidate",
+                "confidence": "medium",
+                "evidence": ["bundled lib/python2.7 runtime directory"],
+            })
 
-    if engine_major == 8 and "3.11" in python_versions:
-        for candidate in candidates:
-            if candidate["profile_id"] == "grimiku-python311":
-                candidate["confidence"] = "strong-indicator"
-                candidate["evidence"].append(f"Ren'Py engine fingerprint {engine_version} is in the Ren'Py 8 generation")
-    elif engine_major == 8 and "2.7" in python_versions:
-        candidates.append({
-            "profile_id": None,
-            "match": "conflicting-evidence",
-            "confidence": "low",
-            "evidence": [
-                f"Ren'Py engine fingerprint {engine_version} is in the Ren'Py 8 generation",
-                "bundled lib/python2.7 runtime directory does not match the inspected Ren'Py Vita 8 profile",
-            ],
-        })
+    if "3.11" in python_versions:
+        if engine_major is not None and engine_major < 8:
+            candidates.append({
+                "profile_id": "grimiku-python311",
+                "match": "conflicting-evidence",
+                "confidence": "low",
+                "evidence": [
+                    "bundled lib/python3.11 runtime directory",
+                    f"Ren'Py engine fingerprint {engine_version} is older than the Ren'Py 8 generation",
+                ],
+            })
+        else:
+            evidence = ["bundled lib/python3.11 runtime directory"]
+            confidence = "medium"
+            if engine_major == 8:
+                confidence = "strong-indicator"
+                evidence.append(f"Ren'Py engine fingerprint {engine_version} is in the Ren'Py 8 generation")
+            candidates.append({
+                "profile_id": "grimiku-python311",
+                "match": "candidate",
+                "confidence": confidence,
+                "evidence": evidence,
+            })
 
     if len(candidates) > 1:
         assessment = "ambiguous"
+    elif candidates and candidates[0]["match"] == "conflicting-evidence":
+        assessment = "conflict"
     elif candidates:
         assessment = "candidate"
     elif engine_major == 8:
