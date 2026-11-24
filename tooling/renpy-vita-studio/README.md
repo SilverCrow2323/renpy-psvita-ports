@@ -14,7 +14,7 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 - Lists and extracts standard RPA-2.0 and RPA-3.0 archives.
 - Uses a restricted pickle unpickler, bounded decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
 - Read-only \`doctor\` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.
-- **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, checks the PSF header and PNG headers, rejects symlinks and refuses to overwrite an existing target.
+- **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, parses bounded PSF metadata, checks that `TITLE_ID` matches the requested ID and reads PNG headers, rejects symlinks and refuses to overwrite an existing target.
 - Writes a SHA-256 manifest for the staged payload.
 
 ## Requirements
@@ -77,7 +77,7 @@ The native runtime baseline is [SonicMastr/renpy-vita](https://github.com/SonicM
 ## Roadmap
 
 1. Broaden archive fixtures and engine/runtime fingerprint coverage.
-2. Validate LiveArea asset dimensions and parse SFO fields safely.
+2. Expand LiveArea asset dimension checks and validate title metadata against runtime profiles.
 3. Add explicit profile adapters for supported Vita runtimes.
 4. Build a reproducible VitaSDK-backed VPK packager.
 5. Desktop GUI and optional USB/network device integration.
