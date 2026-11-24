@@ -93,6 +93,7 @@ def _read_sfo(path: Path) -> tuple[int, dict]:
         fields[key] = value
     return size, fields
 
+
 def _reject_symlinks(root: Path) -> None:
     for path in root.rglob("*"):
         if path.is_symlink():
@@ -157,10 +158,11 @@ def stage_project(
     icon_dimensions = _png_dimensions(sce_sys / "icon0.png")
 
     optional_images = {}
-    for name in ("pic0.png", "pic1.png"):
+    for name in ("pic0.png", "pic1.png", "livearea/contents/bg.png", "livearea/contents/startup.png"):
         candidate = sce_sys / name
         if candidate.is_file():
             optional_images[name] = _png_dimensions(candidate)
+    livearea_template = (sce_sys / "livearea" / "contents" / "template.xml").is_file()
 
     app_root.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -179,6 +181,7 @@ def stage_project(
                 "param_sfo_fields": {key: sfo_fields[key] for key in ("TITLE", "TITLE_ID", "APP_VER", "CATEGORY") if key in sfo_fields},
                 "icon0_png_dimensions": list(icon_dimensions),
                 "optional_png_dimensions": optional_images,
+                "livearea_template_present": livearea_template,
             },
             "files": files,
             "limitations": [
