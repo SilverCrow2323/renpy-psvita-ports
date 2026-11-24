@@ -23,10 +23,10 @@ def write_png(path: Path, width: int = 128, height: int = 128) -> None:
 def make_project(root: Path) -> Path:
     project = root / "project"
     (project / "game").mkdir(parents=True)
-    (project / "game" / "script.rpy").write_text("label start:\\n    return\\n", encoding="utf-8")
+    (project / "game" / "script.rpy").write_text("label start:\n    return\n", encoding="utf-8")
     sce_sys = project / "sce_sys"
     sce_sys.mkdir()
-    (sce_sys / "param.sfo").write_bytes(b"\\x00PSF" + b"\\x00" * 32)
+    (sce_sys / "param.sfo").write_bytes(b"\x00PSF" + b"\x00" * 32)
     write_png(sce_sys / "icon0.png")
     write_png(sce_sys / "pic0.png", 960, 544)
     return project
