@@ -63,7 +63,7 @@ def _read_sfo(path: Path) -> tuple[int, dict]:
         key_position = key_start + key_offset
         if key_position < key_start or key_position >= key_table_end:
             raise StageError(f"{path} contains an out-of-range PSF key offset")
-        key_end = data.find(b"\\x00", key_position, key_table_end)
+        key_end = data.find(b"\x00", key_position, key_table_end)
         if key_end < 0:
             raise StageError(f"{path} contains an unterminated PSF key")
         try:
@@ -79,7 +79,7 @@ def _read_sfo(path: Path) -> tuple[int, dict]:
             raise StageError(f"{path} contains an out-of-range PSF value")
         raw = data[value_start:value_end]
         if value_format == 0x0204:
-            raw = raw.split(b"\\x00", 1)[0]
+            raw = raw.split(b"\x00", 1)[0]
             try:
                 value = raw.decode("utf-8")
             except UnicodeDecodeError as exc:
@@ -183,7 +183,7 @@ def stage_project(
             "files": files,
             "limitations": [
                 "Staging copies files; it does not build or sign a VPK.",
-                "param.sfo is checked for a PSF header only; its fields are not parsed or rewritten.",
+                "param.sfo is parsed read-only with bounded PSF tables; TITLE_ID is cross-checked against the requested app ID.",
                 "PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements.",
                 "A successful staging operation is not a runtime compatibility test.",
             ],
