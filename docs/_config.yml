@@ -1,0 +1,18 @@
+title: Ren'Py Vita Catalogue
+description: Community-curated Ren'Py visual novel ports, compatibility evidence and technical notes for PlayStation Vita.
+theme: minima
+markdown: kramdown
+permalink: pretty
+url: "https://silvercrow2323.github.io"
+baseurl: "/renpy-psvita-ports"
+collections:
+  games:
+    output: true
+    permalink: /games/:name/
+defaults:
+  - scope:
+      path: ""
+      type: games
+    values:
+      layout: game
+      toc: true
