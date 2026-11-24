@@ -15,7 +15,7 @@ A cautious inspection and preparation core for user-supplied Ren'Py projects tar
 - Detects video and native library files as compatibility hints.
 - Lists and extracts standard RPA-2.0 and RPA-3.0 archives.
 - Uses a restricted pickle unpickler, bounded index decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
-- JSON output for future GUI integration.
+- Read-only `doctor` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.\n- JSON output for future GUI integration.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ python -m venv .venv
 # Windows: .venv\\Scripts\\activate
 # Linux:   source .venv/bin/activate
 python -m pip install -e .
-renpy-vita-studio --help
+renpy-vita-studio --help\nrenpy-vita-studio doctor
 ```
 
 ## Examples
