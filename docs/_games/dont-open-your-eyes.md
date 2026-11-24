@@ -36,6 +36,10 @@ A short horror visual novel about a late-night encounter with a mysterious visit
 
 Follow the project repository's release-specific installation instructions. Do not copy commercial game data into this catalogue.
 
+## Installation and reporting guide
+
+See the [central community porting guide](../PORTING-GUIDES.md) for the documented install path, known limitations and reporting instructions.
+
 ## Test status
 
 The existence of a Vita repository is not proof of current full-game compatibility. No fresh hardware test is claimed by this catalogue.
