@@ -69,6 +69,16 @@ class StagingTests(unittest.TestCase):
             self.assertTrue(all(len(item["sha256"]) == 64 for item in manifest["files"]))
             self.assertTrue((project / "game" / "script.rpy").is_file())
 
+    def test_carries_through_optional_runtime_eboot(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            project = make_project(root)
+            (project / "eboot.bin").write_bytes(b"runtime-self")
+            result = stage_project(project, root / "out", "PCSE00001")
+            app = root / "out" / "app" / "PCSE00001"
+            self.assertEqual((app / "eboot.bin").read_bytes(), b"runtime-self")
+            self.assertTrue(result["eboot_present"])
+
     def test_rejects_invalid_title_id(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
