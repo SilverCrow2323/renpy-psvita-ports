@@ -56,7 +56,7 @@ class VpkPackagingTests(unittest.TestCase):
                                 archive.write(source, destination)
                 return CompletedProcess(command, 0, "", "")
 
-            with patch("renpy_vita_studio.package.shutil.which", return_value="/fake/vita-pack-vpk"), patch(
+            with patch("renpy_vita_studio.package.find_vitasdk_tool", return_value="/fake/vita-pack-vpk"), patch(
                 "renpy_vita_studio.package.subprocess.run", side_effect=fake_run
             ) as run:
                 result = build_vpk(app, output)
@@ -98,7 +98,7 @@ class VpkPackagingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             app = make_staged_app(root)
-            with patch("renpy_vita_studio.package.shutil.which", return_value=None):
+            with patch("renpy_vita_studio.package.find_vitasdk_tool", return_value=None):
                 with self.assertRaisesRegex(StageError, "vita-pack-vpk was not found"):
                     build_vpk(app, root / "out.vpk")
 

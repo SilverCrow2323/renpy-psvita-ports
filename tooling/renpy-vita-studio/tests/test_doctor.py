@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from renpy_vita_studio.doctor import inspect_environment
@@ -26,6 +27,7 @@ class EnvironmentDoctorTests(unittest.TestCase):
             "renpy_vita_studio.doctor.shutil.which",
             side_effect=lambda name: f"/fake/{name}" if name in required else None,
         ):
+            Path(tmp, "bin").mkdir()
             report = inspect_environment()
         self.assertEqual(report["vita_sdk"]["status"], "core-tools-detected")
         self.assertTrue(report["tools"]["vita_pack_vpk"]["available"])
