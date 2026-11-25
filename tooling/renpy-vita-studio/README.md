@@ -9,7 +9,7 @@ This is a practical porting and packaging assistant, not a universal compatibili
 ## Guided workflow
 
 1. GAME — select the original game folder (the folder containing game/) or select game/ itself. Studio inventories the project and runs a conservative compatibility preflight. It copies only game/; unrelated files, old Vita scaffolding, eboot.bin and sce_sys in the source folder are ignored.
-2. RUNTIME — choose one of the managed runtime profiles. On first launch, Studio downloads all three runtime profiles in the background and caches them locally. If a download fails, that profile can be retried when you build with it.
+2. RUNTIME — choose one of the managed runtime profiles. On first launch, Studio downloads all three runtime profiles in the background and caches them locally. The status line reports transfer progress in MiB; failed downloads can be retried automatically when you build with that profile. If a download fails, that profile can be retried when you build with it.
 3. LIVEAREA — enter the game title, Vita Title ID and app version. Studio scans the game's own image assets and offers separate drop-downs for bubble icon, boot screen, LiveArea background and startup artwork. Each slot can also use an external image or a generated title card.
 4. BUILD VPK — Studio combines runtime + game + generated Vita metadata, calls VitaSDK's vita-pack-vpk, checks archive CRCs and required entries, and writes a JSON build report and SHA-256 sidecar.
 
@@ -34,7 +34,7 @@ Downloads have size limits, ZIP path-traversal checks, symlink rejection and bou
 - sce_sys/livearea/contents/startup.png — 280×158 startup image.
 - sce_sys/livearea/contents/template.xml — basic a1 LiveArea layout referencing bg0.png and startup.png.
 
-The artwork is cropped to the correct dimensions, converted to compact indexed PNG and checked against per-asset size limits. The bubble icon is written without alpha; the startup image preserves transparency when the source image has it. LiveArea XML is emitted as UTF-8 with CRLF line endings. The default Title ID generator creates a 4-letter + 5-digit identifier; custom IDs may use any 9 uppercase letters or digits. Avoid collisions with another installed app. App version uses the Vita XX.XX format and defaults to 01.00.
+The artwork is cropped to the correct dimensions, converted to compact indexed PNG and checked against per-asset size limits. The bubble icon is written without alpha; the startup image preserves transparency when the source image has it. LiveArea XML is emitted as UTF-8 with CRLF line endings. The default Title ID generator creates a 4-letter + 5-digit identifier; custom IDs may use any 9 uppercase letters or digits. Studio validates the title, Title ID and version before downloading a runtime, and refuses to overwrite an existing VPK or its JSON/checksum sidecars. Avoid collisions with another installed app. App version uses the Vita XX.XX format and defaults to 01.00.
 
 ## Requirements
 

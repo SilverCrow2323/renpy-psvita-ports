@@ -11,7 +11,8 @@
 - Added an end-to-end VPK build pipeline, recursive directory packaging, archive verification, JSON build report and SHA-256 sidecar.
 - Added Linux Debian package generation and a desktop-menu launcher.
 - Added compatibility preflight warnings to the desktop project screen.
-- Added tests for original-folder input, symlink rejection, SFO generation, LiveArea output, runtime profile definitions, archive path traversal and build orchestration.
+- Added tests for original-folder input, symlink rejection, SFO generation, LiveArea output, runtime profile definitions, archive path traversal, artwork choices, bounded download progress, early metadata validation and build orchestration.
+- Build preflight now refuses invalid metadata and existing VPK/JSON/checksum outputs before downloading runtimes.
 
 ## 0.1.0 — Inspection and packaging core
 
