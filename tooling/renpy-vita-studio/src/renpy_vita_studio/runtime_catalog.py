@@ -16,7 +16,7 @@ RUNTIMES = {
         "name": "Ren'Py Vita 8 — PVR (Grimiku v0.2.1)",
         "engine": "Ren'Py 8 · Python 3.11 · PVR_PSP2",
         "url": "https://github.com/Grimiku/RenPy-Vita-8/releases/download/v0.2.1/RenPy_Vita_8_v0.2.1_PVR.zip",
-        "sha256": "139a48dbcf7c8766a0ba7ada4e7db12a52d45b7600ce211f1b7c7ff15b16826d",
+        "sha256": "139a48dbcf7c8766a0ba7ada4e7db12a52d45b7600ce211f1b7c7ff15b16826e",
         "archive": "zip",
         "description": "Ren'Py 8 runtime using the PVR_PSP2 backend. Recommended as the first profile to try with Ren'Py 8 games: this is the standalone PVR build and does not have VitaGL's SHACCCG requirement.",
         "warning": "Game compatibility still needs to be checked. A Ren'Py 8 runtime does not automatically make unsupported scripts, native modules or engine features compatible.",
