@@ -33,12 +33,18 @@ def _safe_member(name: str) -> PurePosixPath:
         raise RuntimeError(f"Drive path in runtime archive: {name}")
     return path
 
-def _download(url: str, destination: Path) -> str:
+def _download(url: str, destination: Path, progress=None) -> str:
     digest = hashlib.sha256()
     total = 0
     request = urllib.request.Request(url, headers={"User-Agent": "RenPy-Vita-Studio/0.2"})
     try:
         with urllib.request.urlopen(request, timeout=30) as response, destination.open("wb") as out:
+            expected_size = int(response.headers.get("Content-Length", "0") or 0)
+            if expected_size > MAX_RUNTIME_BYTES:
+                raise RuntimeError("Runtime download exceeds the 300 MiB safety limit")
+            if progress:
+                progress("Downloading runtime archive (0 MiB)…")
+            last_reported = 0
             while True:
                 chunk = response.read(1024 * 1024)
                 if not chunk:
@@ -48,6 +54,13 @@ def _download(url: str, destination: Path) -> str:
                     raise RuntimeError("Runtime download exceeds the 300 MiB safety limit")
                 digest.update(chunk)
                 out.write(chunk)
+                if progress and total - last_reported >= 4 * 1024 * 1024:
+                    last_reported = total
+                    current_mib = total / (1024 * 1024)
+                    if expected_size:
+                        progress(f"Downloading runtime archive ({current_mib:.1f}/{expected_size / (1024 * 1024):.1f} MiB)…")
+                    else:
+                        progress(f"Downloading runtime archive ({current_mib:.1f} MiB)…")
     except Exception:
         destination.unlink(missing_ok=True)
         raise
@@ -106,7 +119,7 @@ def _ensure_runtime_unlocked(runtime_id: str, progress=None) -> dict:
         archive_path = work / "runtime.zip"
         if progress:
             progress("Downloading runtime archive…")
-        digest = _download(profile["url"], archive_path)
+        digest = _download(profile["url"], archive_path, progress=progress)
         expected = profile.get("sha256")
         if expected and digest.lower() != expected.lower():
             raise RuntimeError(f"Runtime SHA-256 mismatch: expected {expected}, received {digest}")
