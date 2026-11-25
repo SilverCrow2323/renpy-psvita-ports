@@ -34,7 +34,7 @@ Downloads have size limits, ZIP path-traversal checks, symlink rejection and bou
 - sce_sys/livearea/contents/startup.png — 280×158 startup image.
 - sce_sys/livearea/contents/template.xml — basic a1 LiveArea layout referencing bg0.png and startup.png.
 
-The artwork is cropped to the correct dimensions, converted to compact indexed PNG and checked against per-asset size limits. The default Title ID generator creates a 4-letter + 5-digit identifier; custom IDs may use any 9 uppercase letters or digits. Avoid collisions with another installed app. App version uses the Vita XX.XX format and defaults to 01.00.
+The artwork is cropped to the correct dimensions, converted to compact indexed PNG and checked against per-asset size limits. The bubble icon is written without alpha; the startup image preserves transparency when the source image has it. LiveArea XML is emitted as UTF-8 with CRLF line endings. The default Title ID generator creates a 4-letter + 5-digit identifier; custom IDs may use any 9 uppercase letters or digits. Avoid collisions with another installed app. App version uses the Vita XX.XX format and defaults to 01.00.
 
 ## Requirements
 

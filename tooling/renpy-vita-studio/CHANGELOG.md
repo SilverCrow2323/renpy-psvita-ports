@@ -6,7 +6,7 @@
 - The input is the user's original game root or its game/ directory; no prebuilt Vita app folder or user-created sce_sys/ is required.
 - Added managed Ren'Py Vita 7 Legacy, Ren'Py Vita 8 PVR 0.2.1 and Ren'Py Vita 8 VitaGL 0.2.1 runtime profiles.
 - Added first-launch background downloads for all runtime profiles, upstream SHA-256 verification where published, safe ZIP extraction and persistent runtime cache.
-- Added game-artwork discovery with separate image selectors for icon, boot screen, LiveArea background and startup image; added automatic crop/resize, indexed PNG output and generated LiveArea XML.
+- Added game-artwork discovery with separate image selectors for icon, boot screen, LiveArea background and startup image; added automatic crop/resize, indexed PNG output, transparent startup-art support and Vita-compatible CRLF LiveArea XML.
 - Added automatic Vita param.sfo generation, editable app version and a safe default Title ID.
 - Added an end-to-end VPK build pipeline, recursive directory packaging, archive verification, JSON build report and SHA-256 sidecar.
 - Added Linux Debian package generation and a desktop-menu launcher.

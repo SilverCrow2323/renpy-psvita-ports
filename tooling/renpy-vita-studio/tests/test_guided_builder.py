@@ -2,7 +2,7 @@ from __future__ import annotations
 import tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
-from PIL import Image
+from PIL import Image, ImageDraw
 from renpy_vita_studio.builder import build_game_vpk
 from renpy_vita_studio.livearea import generate_livearea, write_param_sfo
 from renpy_vita_studio.project_source import resolve_game_directory, default_title_id
