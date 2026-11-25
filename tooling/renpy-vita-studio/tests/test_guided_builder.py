@@ -17,7 +17,7 @@ class GuidedBuilderTests(unittest.TestCase):
             (game/"script.rpy").write_text("label start: pass",encoding="utf-8")
             (root/"sce_sys").mkdir(); (root/"eboot.bin").write_bytes(b"not used")
             resolved_root,resolved_game=resolve_game_directory(root)
-            self.assertEqual(resolved_root,root); self.assertEqual(resolved_game,game)
+            self.assertEqual(resolved_root,root.resolve()); self.assertEqual(resolved_game,game.resolve())
             self.assertRegex(default_title_id("My Game",root),r"^[A-Z]{4}[0-9]{5}$")
 
     def test_game_directory_symlinks_are_rejected(self):
