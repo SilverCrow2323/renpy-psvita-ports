@@ -9,6 +9,7 @@ from .project_source import resolve_game_directory,discover_artwork,default_titl
 from .runtime_catalog import RUNTIMES
 from .runtime_manager import get_installed_runtime, ensure_runtime
 from .inspect import inspect_project
+from .artwork_selection import GENERATED_ARTWORK_LABEL, artwork_choices, resolve_artwork_selection
 
 ART_SLOTS={"Bubble icon":"icon0","Boot screen":"pic0","LiveArea background":"bg0","Startup artwork":"startup"}
 
@@ -131,10 +132,11 @@ class StudioApp:
     def _scan_artwork(self):
         try:
             _root,game=resolve_game_directory(self.project_var.get()); self.artwork_paths=discover_artwork(game)
-            values=[str(p.relative_to(game)) for p in self.artwork_paths]
+            values=artwork_choices(self.artwork_paths,game)
             for label,var in self.art_vars.items():
                 self.art_combos[label]["values"]=values
-                if values and not var.get(): var.set(values[0])
+                if not var.get() or (var.get() not in values and not Path(var.get()).is_absolute()):
+                    var.set(GENERATED_ARTWORK_LABEL)
             self.status_var.set(f"Found {len(self.artwork_paths)} possible artwork files.")
         except Exception as exc: messagebox.showerror("Artwork scan",str(exc))
 
@@ -151,8 +153,9 @@ class StudioApp:
         _root,game=resolve_game_directory(self.project_var.get()); selected={}
         for label,var in self.art_vars.items():
             value=var.get().strip()
-            if value:
-                path=Path(value); selected[ART_SLOTS[label]]=path if path.is_absolute() else game/path
+            path=resolve_artwork_selection(value,game)
+            if path is not None:
+                selected[ART_SLOTS[label]]=path
         return selected
 
     def _start_build(self):
