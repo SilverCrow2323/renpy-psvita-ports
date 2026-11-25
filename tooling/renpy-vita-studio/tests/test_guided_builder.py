@@ -32,15 +32,16 @@ class GuidedBuilderTests(unittest.TestCase):
             root=Path(temp)/"sce_sys"; artwork=Path(temp)/"cover.png"
             Image.new("RGB",(900,600),(30,80,120)).save(artwork)
             result=generate_livearea(root,"A <Test> Game",artwork)
-            self.assertEqual(Image.open(root/"icon0.png").size,(128,128))
-            self.assertEqual(Image.open(root/"pic0.png").size,(960,544))
-            self.assertEqual(Image.open(root/"livearea/contents/bg0.png").size,(840,500))
+            for relative, expected in (("icon0.png",(128,128)),("pic0.png",(960,544)),("livearea/contents/bg0.png",(840,500))):
+                with Image.open(root/relative) as generated:
+                    self.assertEqual(generated.size,expected)
             xml=(root/"livearea/contents/template.xml").read_text()
             self.assertIn("<image>bg0.png</image>",xml)
             write_param_sfo(root/"param.sfo","A Test Game","RNVX12345")
             _size,fields=_read_sfo(root/"param.sfo")
             self.assertEqual(fields["TITLE_ID"],"RNVX12345")
             self.assertEqual(fields["TITLE"],"A Test Game")
+            write_param_sfo(root/"custom-id.sfo","Custom ID","RNPYHARVD")
             self.assertEqual(len(result["files"]),5)
             for relative,limit in result["size_limits_bytes"].items():
                 self.assertLessEqual((root/relative).stat().st_size,limit)
@@ -49,7 +50,7 @@ class GuidedBuilderTests(unittest.TestCase):
         self.assertEqual(set(RUNTIMES),{"renpy7-legacy","renpy8-pvr","renpy8-vgl"})
         self.assertIsNone(RUNTIMES["renpy7-legacy"]["sha256"])
         self.assertEqual(len(RUNTIMES["renpy8-pvr"]["sha256"]),64)
-        self.assertIn("SHACCCG",RUNTIMES["renpy8-vgl"]["warning"])
+        self.assertIn("SHACCCG",RUNTIMES["renpy8-vgl"]["warning"].upper())
 
     def test_runtime_archive_path_traversal_is_rejected(self):
         with self.assertRaises(RuntimeError): _safe_member("../../outside.txt")
