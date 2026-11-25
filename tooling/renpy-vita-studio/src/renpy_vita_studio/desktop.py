@@ -186,6 +186,6 @@ class StudioApp:
         self.build_button.configure(state="normal"); self._log("ERROR: "+error); messagebox.showerror("VPK build failed",error)
 
 def main():
-    root=tk.Tk(); app=StudioApp(root); app._prefetch_runtimes(); root.mainloop()
+    root=tk.Tk(); app=StudioApp(root); root.after(100,app._prefetch_runtimes); root.mainloop()
 
 if __name__=="__main__": main()
