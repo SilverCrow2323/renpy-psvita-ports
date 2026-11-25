@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import tempfile
+import threading
 import urllib.request
 import zipfile
 from pathlib import Path, PurePosixPath
@@ -85,7 +86,7 @@ def _find_runtime_root(extracted: Path) -> Path:
     # Prefer the shallowest eboot root to avoid selecting a nested example/template.
     return min(candidates, key=lambda p: len(p.parts))
 
-def ensure_runtime(runtime_id: str, progress=None) -> dict:
+def _ensure_runtime_unlocked(runtime_id: str, progress=None) -> dict:
     if runtime_id not in RUNTIMES:
         raise RuntimeError(f"Unknown runtime profile: {runtime_id}")
     profile = RUNTIMES[runtime_id]
@@ -135,6 +136,17 @@ def ensure_runtime(runtime_id: str, progress=None) -> dict:
         return {**metadata, "payload_path": str(cache / "payload")}
     finally:
         shutil.rmtree(work, ignore_errors=True)
+
+
+_RUNTIME_LOCKS: dict[str, threading.Lock] = {}
+_RUNTIME_LOCKS_GUARD = threading.Lock()
+
+def ensure_runtime(runtime_id: str, progress=None) -> dict:
+    # First-run prefetch and a simultaneous VPK build must not replace the same cache at once.
+    with _RUNTIME_LOCKS_GUARD:
+        lock = _RUNTIME_LOCKS.setdefault(runtime_id, threading.Lock())
+    with lock:
+        return _ensure_runtime_unlocked(runtime_id, progress)
 
 def get_installed_runtime(runtime_id: str) -> dict | None:
     cache = runtime_cache_dir() / runtime_id

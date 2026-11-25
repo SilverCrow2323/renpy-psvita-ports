@@ -10,7 +10,7 @@ This is a practical porting and packaging assistant, not a universal compatibili
 
 1. GAME — select the original game folder (the folder containing game/) or select game/ itself. Studio inventories the project and runs a conservative compatibility preflight. It copies only game/; unrelated files, old Vita scaffolding, eboot.bin and sce_sys in the source folder are ignored.
 2. RUNTIME — choose one of the managed runtime profiles. Studio downloads the selected runtime on first use, verifies its published digest where available, safely extracts it and caches it under the user's data directory.
-3. LIVEAREA — enter the game title and Vita Title ID. Studio scans the game's own image assets and offers them in a drop-down. It can also use an external image or generate a simple title card. Artwork is cropped, resized, palette-optimized and written into a fresh sce_sys tree. A Vita-format param.sfo is generated automatically.
+3. LIVEAREA — enter the game title, Vita Title ID and app version. Studio scans the game's own image assets and offers separate drop-downs for bubble icon, boot screen, LiveArea background and startup artwork. Each slot can also use an external image or a generated title card.
 4. BUILD VPK — Studio combines runtime + game + generated Vita metadata, calls VitaSDK's vita-pack-vpk, checks archive CRCs and required entries, and writes a JSON build report and SHA-256 sidecar.
 
 ## Runtime choices
@@ -34,7 +34,7 @@ Downloads have size limits, ZIP path-traversal checks, symlink rejection and bou
 - sce_sys/livearea/contents/startup.png — 280×158 startup image.
 - sce_sys/livearea/contents/template.xml — basic a1 LiveArea layout referencing bg0.png and startup.png.
 
-The images are encoded as compact indexed PNGs with per-asset size limits. The default Title ID generator creates a 4-letter + 5-digit Vita-format ID; the user can edit it. Avoid collisions with another installed app.
+The artwork is cropped to the correct dimensions, converted to compact indexed PNG and checked against per-asset size limits. The default Title ID generator creates a 4-letter + 5-digit identifier; custom IDs may use any 9 uppercase letters or digits. Avoid collisions with another installed app. App version uses the Vita XX.XX format and defaults to 01.00.
 
 ## Requirements
 
@@ -45,7 +45,7 @@ The images are encoded as compact indexed PNGs with per-asset size limits. The d
 
 On MX Linux / Debian-based systems, install the GUI and packaging prerequisites:
 
-    sudo apt install python3-tk
+    sudo apt install python3-tk python3-pil dpkg-dev
     cd tooling/renpy-vita-studio
     python3 -m venv .venv
     . .venv/bin/activate
@@ -53,7 +53,16 @@ On MX Linux / Debian-based systems, install the GUI and packaging prerequisites:
     python -m pip install -e .
     renpy-vita-studio-gui
 
-CLI inspection and lower-level commands remain available:
+## Build a Debian package
+
+The repository includes a Debian package builder for the refreshed desktop application:
+
+    cd tooling/renpy-vita-studio
+    bash packaging/linux/build-deb.sh
+
+The generated package installs the GUI launcher, command-line launcher and desktop-menu entry. VitaSDK is intentionally not bundled: install VitaSDK separately and make sure vita-pack-vpk is on PATH.
+
+## CLI tools
 
     renpy-vita-studio --help
     renpy-vita-studio inspect "/path/to/original-game" --json
@@ -64,7 +73,7 @@ CLI inspection and lower-level commands remain available:
 ## Compatibility preflight
 
 The preflight reports evidence such as Ren'Py engine fingerprints, video files, native libraries, archives and other compatibility hints. It does not execute game code or guarantee that the selected runtime can run the game. In particular:
-- Video playback is not generally supported by the referenced Vita runtimes.
+- Video playback is not generally supported by the referenced runtimes.
 - Native libraries compiled for Windows, Linux or desktop macOS are not Vita binaries.
 - Custom/encrypted archive variants and RPYC decompilation are not handled.
 - Game-specific script changes, screen/input adjustments, memory constraints and save compatibility may still require manual porting work.

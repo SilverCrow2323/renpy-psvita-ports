@@ -38,3 +38,22 @@ jobs:
         env:
           PYTHONPATH: tooling/renpy-vita-studio/src
         run: python -m renpy_vita_studio --help
+
+  deb-package:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Debian packaging script
+        run: bash -n tooling/renpy-vita-studio/packaging/linux/build-deb.sh
+      - name: Build Debian package
+        run: bash tooling/renpy-vita-studio/packaging/linux/build-deb.sh "$GITHUB_WORKSPACE/renpy-vita-studio.deb"
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: renpy-vita-studio-deb
+          path: renpy-vita-studio.deb
+          if-no-files-found: error

@@ -9,7 +9,7 @@ import shutil
 import struct
 from pathlib import Path
 
-TITLE_ID_RE = re.compile(r"^[A-Z]{4}[0-9]{5}$")
+TITLE_ID_RE = re.compile(r"^[A-Z0-9]{9}$")
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 SFO_MAGIC = b"\x00PSF"
 
@@ -125,7 +125,7 @@ def stage_project(
     target = Path(destination).expanduser().resolve()
 
     if not TITLE_ID_RE.fullmatch(title_id):
-        raise StageError("title ID must use 4 uppercase letters followed by 5 digits")
+        raise StageError("title ID must contain exactly 9 uppercase letters or digits")
     if not source.is_dir():
         raise StageError(f"project directory does not exist: {source}")
 

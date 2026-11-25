@@ -47,7 +47,13 @@ class VpkPackagingTests(unittest.TestCase):
                     for index, value in enumerate(command):
                         if value == "--add":
                             source, destination = command[index + 1].split("=", 1)
-                            archive.write(source, destination)
+                            source_path = Path(source)
+                            if source_path.is_dir():
+                                for child in source_path.rglob("*"):
+                                    if child.is_file():
+                                        archive.write(child, (Path(destination) / child.relative_to(source_path)).as_posix())
+                            else:
+                                archive.write(source, destination)
                 return CompletedProcess(command, 0, "", "")
 
             with patch("renpy_vita_studio.package.shutil.which", return_value="/fake/vita-pack-vpk"), patch(
