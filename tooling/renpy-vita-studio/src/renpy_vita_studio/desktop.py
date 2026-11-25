@@ -39,7 +39,7 @@ class StudioApp:
                     failures.append(f"{name}: {exc}")
             self.root.after(0,self._refresh_runtime_status)
             if failures:
-                detail="Some runtime downloads could not be completed. They can be retried automatically when you build with that profile.\\n\\n"+"\\n".join(failures)
+                detail="Some runtime downloads could not be completed. They can be retried automatically when you build with that profile.\n\n"+"\n".join(failures)
                 self.root.after(0,lambda msg=detail:messagebox.showwarning("Runtime download",msg))
             else:
                 self.root.after(0,lambda:self.status_var.set("All three runtime profiles are downloaded and cached."))
