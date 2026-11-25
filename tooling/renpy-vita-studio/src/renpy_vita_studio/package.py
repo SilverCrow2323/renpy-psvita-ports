@@ -12,7 +12,9 @@ def _safe_add_arg(source: Path,destination: str) -> list[str]:
 
 def build_vpk(staged_app: str | Path,output: str | Path) -> dict:
     """Call VitaSDK's packer; add whole directories recursively to keep argv bounded."""
-    app=Path(staged_app).expanduser().resolve(); target=Path(output).expanduser().resolve()
+    app=Path(staged_app).expanduser().resolve(); target_input=Path(output).expanduser()
+    if target_input.is_symlink(): raise StageError(f"output path is a symbolic link: {target_input}")
+    target=target_input.resolve()
     if not app.is_dir(): raise StageError(f"staged app directory does not exist: {app}")
     title_id=app.name
     if not re.fullmatch(r"[A-Z0-9]{9}",title_id): raise StageError("staged app folder must use a 9-character uppercase alphanumeric title ID")

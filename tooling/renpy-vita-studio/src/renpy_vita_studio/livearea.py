@@ -83,11 +83,19 @@ def generate_livearea(sce_sys: str | Path,title: str,artwork=None) -> dict:
 def _utf8_value(value: str,max_bytes: int) -> bytes:
     return value.encode("utf-8")[:max_bytes].decode("utf-8","ignore").encode("utf-8")+b"\0"
 
-def write_param_sfo(path: str | Path,title: str,title_id: str,app_version: str="01.00") -> None:
+def validate_app_metadata(title: str,title_id: str,app_version: str="01.00") -> None:
+    if not isinstance(title,str) or not title.strip():
+        raise LiveAreaError("Game title cannot be empty")
+    if len(title.encode("utf-8")) > 128:
+        raise LiveAreaError("Game title is too long; use at most 128 UTF-8 bytes")
     if not re.fullmatch(r"[A-Z0-9]{9}",title_id):
         raise LiveAreaError("TITLE_ID must contain exactly 9 uppercase letters or digits")
     if not re.fullmatch(r"\d{2}\.\d{2}",app_version):
         raise LiveAreaError("App version must use the XX.XX format, for example 01.00")
+
+
+def write_param_sfo(path: str | Path,title: str,title_id: str,app_version: str="01.00") -> None:
+    validate_app_metadata(title,title_id,app_version)
     fields=[("TITLE",_utf8_value(title,128)),("TITLE_ID",title_id.encode("ascii")+b"\0"),
             ("APP_VER",app_version.encode("ascii")+b"\0"),("CATEGORY",b"gd\0")]
     keys=bytearray(); data=bytearray(); entries=bytearray()

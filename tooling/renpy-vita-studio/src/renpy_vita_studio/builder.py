@@ -2,7 +2,7 @@
 from __future__ import annotations
 import hashlib,json,shutil,tempfile
 from pathlib import Path
-from .livearea import generate_livearea,write_param_sfo
+from .livearea import generate_livearea,write_param_sfo,validate_app_metadata,LiveAreaError
 from .package import build_vpk
 from .project_source import resolve_game_directory
 from .runtime_manager import ensure_runtime
@@ -28,9 +28,20 @@ def _sha256_file(path: Path) -> str:
 
 def build_game_vpk(selected_game_folder,runtime_id,title,title_id,output_vpk,artwork=None,progress=None,app_version="01.00") -> dict:
     _project_root,game_dir=resolve_game_directory(selected_game_folder)
-    output=Path(output_vpk).expanduser().resolve()
+    try:
+        validate_app_metadata(title,title_id,app_version)
+    except LiveAreaError as exc:
+        raise BuildError(str(exc)) from exc
+    output_input=Path(output_vpk).expanduser()
+    if output_input.is_symlink():
+        raise BuildError(f"Output path is a symbolic link; choose a regular file path: {output_input}")
+    output=output_input.resolve()
     if output.suffix.lower()!=".vpk": raise BuildError("Output filename must end in .vpk")
-    if output.exists(): raise BuildError(f"Output already exists; choose a new filename: {output}")
+    manifest_path=output.with_suffix(output.suffix+".json")
+    checksum_path=output.with_suffix(output.suffix+".sha256")
+    for candidate in (output,manifest_path,checksum_path):
+        if candidate.exists() or candidate.is_symlink():
+            raise BuildError(f"Output already exists; refusing to overwrite: {candidate}")
     if game_dir in output.parents: raise BuildError("Save the VPK outside the original game folder")
     runtime=ensure_runtime(runtime_id,progress=progress); runtime_root=Path(runtime["payload_path"])
     if progress: progress("Preparing Vita application…")
@@ -46,8 +57,17 @@ def build_game_vpk(selected_game_folder,runtime_id,title,title_id,output_vpk,art
         manifest={"format":"renpy-vita-studio-build-v1","title":title,"title_id":title_id,"app_version":app_version,
                   "runtime":runtime,"source_game_directory":str(game_dir),"copied_only_game_directory":True,
                   "artwork":artwork_result,"vpk":result,"sha256":digest}
-        manifest_path=output.with_suffix(output.suffix+".json")
-        manifest_path.write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
-        checksum_path=output.with_suffix(output.suffix+".sha256")
-        checksum_path.write_text(f"{digest}  {output.name}\n",encoding="ascii")
+        created_sidecars=[]
+        try:
+            with manifest_path.open("x",encoding="utf-8") as stream:
+                stream.write(json.dumps(manifest,indent=2,ensure_ascii=False)+"\n")
+            created_sidecars.append(manifest_path)
+            with checksum_path.open("x",encoding="ascii") as stream:
+                stream.write(f"{digest}  {output.name}\n")
+            created_sidecars.append(checksum_path)
+        except Exception:
+            for sidecar in created_sidecars:
+                sidecar.unlink(missing_ok=True)
+            output.unlink(missing_ok=True)
+            raise
         return {"vpk":result,"manifest":str(manifest_path),"sha256":digest,"checksum_file":str(checksum_path),"artwork":artwork_result}

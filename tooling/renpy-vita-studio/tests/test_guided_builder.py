@@ -3,7 +3,7 @@ import tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
 from PIL import Image, ImageDraw
-from renpy_vita_studio.builder import build_game_vpk
+from renpy_vita_studio.builder import build_game_vpk, BuildError
 from renpy_vita_studio.livearea import generate_livearea, write_param_sfo
 from renpy_vita_studio.project_source import resolve_game_directory, default_title_id
 from renpy_vita_studio.runtime_catalog import RUNTIMES
@@ -45,6 +45,36 @@ class GuidedBuilderTests(unittest.TestCase):
             self.assertEqual(len(result["files"]),5)
             for relative,limit in result["size_limits_bytes"].items():
                 self.assertLessEqual((root/relative).stat().st_size,limit)
+
+    def test_invalid_metadata_is_rejected_before_runtime_download(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)/"Game"; (root/"game").mkdir(parents=True)
+            (root/"game"/"script.rpy").write_text("label start: pass",encoding="utf-8")
+            output=Path(temp)/"Game.vpk"
+            with patch("renpy_vita_studio.builder.ensure_runtime") as ensure:
+                with self.assertRaisesRegex(BuildError,"9 uppercase letters"):
+                    build_game_vpk(root,"renpy8-pvr","Game","bad-id",output)
+                ensure.assert_not_called()
+
+    def test_existing_build_sidecar_is_never_overwritten(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)/"Game"; (root/"game").mkdir(parents=True)
+            (root/"game"/"script.rpy").write_text("label start: pass",encoding="utf-8")
+            output=Path(temp)/"Game.vpk"
+            sidecar=Path(str(output)+".json")
+            sidecar.write_text("user data",encoding="utf-8")
+            with patch("renpy_vita_studio.builder.ensure_runtime") as ensure:
+                with self.assertRaisesRegex(BuildError,"refusing to overwrite"):
+                    build_game_vpk(root,"renpy8-pvr","Game","RNVX12345",output)
+                ensure.assert_not_called()
+            self.assertEqual(sidecar.read_text(encoding="utf-8"),"user data")
+
+    def test_invalid_title_and_app_version_are_rejected_by_sfo_writer(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with self.assertRaisesRegex(ValueError,"cannot be empty"):
+                write_param_sfo(Path(temp)/"empty.sfo","","RNVX12345")
+            with self.assertRaisesRegex(ValueError,"XX.XX"):
+                write_param_sfo(Path(temp)/"bad-version.sfo","Game","RNVX12345","1.0")
 
     def test_runtime_catalogue_has_three_distinct_choices(self):
         self.assertEqual(set(RUNTIMES),{"renpy7-legacy","renpy8-pvr","renpy8-vgl"})
