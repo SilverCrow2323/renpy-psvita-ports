@@ -37,6 +37,7 @@ class EnvironmentDoctorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, patch.dict(
             os.environ, {"VITASDK": tmp}, clear=True
         ), patch("renpy_vita_studio.doctor.shutil.which", return_value=None):
+            Path(tmp, "bin").mkdir()
             report = inspect_environment()
         self.assertEqual(report["vita_sdk"]["status"], "partial")
         self.assertTrue(report["vita_sdk"]["path_exists"])
