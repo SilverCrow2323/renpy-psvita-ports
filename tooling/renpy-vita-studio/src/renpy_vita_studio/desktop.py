@@ -7,7 +7,7 @@ from pathlib import Path
 from .builder import build_game_vpk
 from .project_source import resolve_game_directory,discover_artwork,default_title_id
 from .runtime_catalog import RUNTIMES
-from .runtime_manager import get_installed_runtime
+from .runtime_manager import get_installed_runtime, ensure_runtime
 from .inspect import inspect_project
 
 ART_SLOTS={"Bubble icon":"icon0","Boot screen":"pic0","LiveArea background":"bg0","Startup artwork":"startup"}
@@ -20,6 +20,29 @@ class StudioApp:
         self.output_var=tk.StringVar(); self.status_var=tk.StringVar(value="Choose the original game folder to begin.")
         self.art_vars={label:tk.StringVar() for label in ART_SLOTS}; self.art_slot_var=tk.StringVar(value="Bubble icon")
         self.artwork_paths=[]; self._build_ui(); self._refresh_runtime_status()
+
+    def _prefetch_runtimes(self):
+        missing=[key for key in RUNTIMES if not get_installed_runtime(key)]
+        if not missing:
+            return
+        self.status_var.set("First launch: downloading the three managed Vita runtimes in the background…")
+        def worker():
+            failures=[]
+            for key in missing:
+                name=RUNTIMES[key]["name"]
+                def report(message, runtime_name=name):
+                    self.root.after(0,lambda msg=message,n=runtime_name:self.status_var.set(f"{n}: {msg}"))
+                try:
+                    ensure_runtime(key,progress=report)
+                except Exception as exc:
+                    failures.append(f"{name}: {exc}")
+            self.root.after(0,self._refresh_runtime_status)
+            if failures:
+                detail="Some runtime downloads could not be completed. They can be retried automatically when you build with that profile.\\n\\n"+"\\n".join(failures)
+                self.root.after(0,lambda msg=detail:messagebox.showwarning("Runtime download",msg))
+            else:
+                self.root.after(0,lambda:self.status_var.set("All three runtime profiles are downloaded and cached."))
+        threading.Thread(target=worker,daemon=True).start()
 
     def _build_ui(self):
         style=ttk.Style(); style.theme_use("clam")
@@ -163,6 +186,6 @@ class StudioApp:
         self.build_button.configure(state="normal"); self._log("ERROR: "+error); messagebox.showerror("VPK build failed",error)
 
 def main():
-    root=tk.Tk(); StudioApp(root); root.mainloop()
+    root=tk.Tk(); app=StudioApp(root); app._prefetch_runtimes(); root.mainloop()
 
 if __name__=="__main__": main()

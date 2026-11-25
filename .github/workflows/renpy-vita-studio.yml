@@ -30,6 +30,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Studio dependencies
         run: python -m pip install -e tooling/renpy-vita-studio
+      - name: Compile Python sources
+        run: python -m compileall -q tooling/renpy-vita-studio/src/renpy_vita_studio
       - name: Run test suite
         env:
           PYTHONPATH: tooling/renpy-vita-studio/src

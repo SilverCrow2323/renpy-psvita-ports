@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-VERSION="$(python3 -c 'import tomllib; print(tomllib.load(open("'"$ROOT"'/pyproject.toml", "rb"))["project"]["version"])')"
+VERSION="$(python3 -c 'import tomllib,sys; print(tomllib.load(open(sys.argv[1], "rb"))["project"]["version"])' "$ROOT/pyproject.toml")"
 OUT="${1:-$ROOT/dist/renpy-vita-studio_${VERSION}_all.deb}"
 OUT="$(mkdir -p "$(dirname "$OUT")" && cd "$(dirname "$OUT")" && pwd)/$(basename "$OUT")"
 WORK="$(mktemp -d)"

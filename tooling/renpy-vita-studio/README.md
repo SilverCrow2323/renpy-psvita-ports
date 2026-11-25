@@ -9,7 +9,7 @@ This is a practical porting and packaging assistant, not a universal compatibili
 ## Guided workflow
 
 1. GAME — select the original game folder (the folder containing game/) or select game/ itself. Studio inventories the project and runs a conservative compatibility preflight. It copies only game/; unrelated files, old Vita scaffolding, eboot.bin and sce_sys in the source folder are ignored.
-2. RUNTIME — choose one of the managed runtime profiles. Studio downloads the selected runtime on first use, verifies its published digest where available, safely extracts it and caches it under the user's data directory.
+2. RUNTIME — choose one of the managed runtime profiles. On first launch, Studio downloads all three runtime profiles in the background and caches them locally. If a download fails, that profile can be retried when you build with it.
 3. LIVEAREA — enter the game title, Vita Title ID and app version. Studio scans the game's own image assets and offers separate drop-downs for bubble icon, boot screen, LiveArea background and startup artwork. Each slot can also use an external image or a generated title card.
 4. BUILD VPK — Studio combines runtime + game + generated Vita metadata, calls VitaSDK's vita-pack-vpk, checks archive CRCs and required entries, and writes a JSON build report and SHA-256 sidecar.
 
