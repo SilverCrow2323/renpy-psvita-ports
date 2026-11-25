@@ -21,8 +21,8 @@ def build_vpk(staged_app: str | Path, output: str | Path) -> dict:
     if not app.is_dir():
         raise StageError(f"staged app directory does not exist: {app}")
     title_id = app.name
-    if not re.fullmatch(r"[A-Z0-9]{9}", title_id):
-        raise StageError("staged app folder must be named with its 9-character uppercase title ID")
+    if not re.fullmatch(r"[A-Z]{4}[0-9]{5}", title_id):
+        raise StageError("staged app folder must be named with its Vita-format title ID (4 letters + 5 digits)")
     if target.suffix.lower() != ".vpk":
         raise StageError("output filename must use the .vpk extension")
     if target.exists() or target.is_symlink():

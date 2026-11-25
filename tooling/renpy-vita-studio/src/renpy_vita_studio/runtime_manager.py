@@ -93,7 +93,9 @@ def ensure_runtime(runtime_id: str, progress=None) -> dict:
     marker = cache / "runtime-install.json"
     if marker.is_file() and (cache / "payload" / "eboot.bin").is_file():
         try:
-            return json.loads(marker.read_text(encoding="utf-8"))
+            data = json.loads(marker.read_text(encoding="utf-8"))
+            data["payload_path"] = str(cache / "payload")
+            return data
         except (OSError, json.JSONDecodeError):
             pass
 

@@ -1,4 +1,4 @@
-name: Ren'Py Vita Studio Core
+name: Ren'Py Vita Studio
 
 on:
   push:
@@ -28,7 +28,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - name: Run standard-library test suite
+      - name: Install Studio dependencies
+        run: python -m pip install -e tooling/renpy-vita-studio
+      - name: Run test suite
         env:
           PYTHONPATH: tooling/renpy-vita-studio/src
         run: python -m unittest discover -s tooling/renpy-vita-studio/tests -v

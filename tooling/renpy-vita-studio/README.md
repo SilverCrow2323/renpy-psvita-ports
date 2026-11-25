@@ -1,100 +1,83 @@
-# Ren'Py Vita Studio — core preview
+# Ren'Py Vita Studio
 
-<sub>SPDW Factory · Windows / Linux · Python 3.11+</sub>
+SPDW Factory · Linux / Windows · Python 3.11+
 
-A cautious inspection and preparation core for user-supplied Ren'Py projects targeting PlayStation Vita.
+A guided desktop workflow that starts from the original Ren'Py project folder and produces a PlayStation Vita VPK. The user does not need to create an app/TITLE_ID folder, prepare sce_sys, supply a prebuilt LiveArea, or browse for a local runtime directory.
 
-> **Alpha foundation, not a one-click port converter.** This tool inventories projects, reads standard RPA-2.0 / RPA-3.0 archives and prepares a non-destructive Vita app staging folder. It does not patch games, build or adapt a Ren'Py runtime, or promise compatibility. It can package an already-built Vita `eboot.bin` when VitaSDK's VPK tool is available.
+This is a practical porting and packaging assistant, not a universal compatibility converter. It packages the selected game's game/ directory with a chosen prebuilt Vita runtime. It does not patch game scripts, port native desktop libraries, or make unsupported Ren'Py features work on Vita.
 
-## Current capabilities
+## Guided workflow
 
-- Read-only project inventory: \`game/\`, scripts, RPA archives, media, native libraries, Python runtime directories and Vita LiveArea assets.
-- Reads \`game/options.rpy\` without executing it. Game version and Ren'Py engine version are kept separate.
-- Fingerprints modern engine versions from \`renpy/vc_version.py\` and legacy versions from a literal \`version_tuple\`; confidence and evidence are reported.
-- Lists and extracts standard RPA-2.0 and RPA-3.0 archives.
-- Uses a restricted pickle unpickler, bounded decompression, path-traversal checks, extraction size limits and fresh-directory extraction.
-- Read-only \`doctor\` report for host OS, Python, CMake/build tools, VitaSDK environment and Vita cross-compiler discovery. It never runs compilers or modifies the host.
-- **Staging preview:** copies \`game/\` and \`sce_sys/\` into \`app/<TITLE_ID>/\`, parses bounded PSF metadata, checks that `TITLE_ID` matches the requested ID and checks PNG headers/dimensions, reports LiveArea assets, rejects symlinks and refuses to overwrite an existing target.
-- Carries through an optional runtime-built `eboot.bin` and writes a SHA-256 manifest for the staged payload.
-- **VPK packaging preview:** invokes VitaSDK `vita-pack-vpk` without a shell, refuses overwrite, and checks the VPK CRC and verifies the expected archive entries.
+1. GAME — select the original game folder (the folder containing game/) or select game/ itself. Studio inventories the project and runs a conservative compatibility preflight. It copies only game/; unrelated files, old Vita scaffolding, eboot.bin and sce_sys in the source folder are ignored.
+2. RUNTIME — choose one of the managed runtime profiles. Studio downloads the selected runtime on first use, verifies its published digest where available, safely extracts it and caches it under the user's data directory.
+3. LIVEAREA — enter the game title and Vita Title ID. Studio scans the game's own image assets and offers them in a drop-down. It can also use an external image or generate a simple title card. Artwork is cropped, resized, palette-optimized and written into a fresh sce_sys tree. A Vita-format param.sfo is generated automatically.
+4. BUILD VPK — Studio combines runtime + game + generated Vita metadata, calls VitaSDK's vita-pack-vpk, checks archive CRCs and required entries, and writes a JSON build report and SHA-256 sidecar.
+
+## Runtime choices
+
+| Profile | Engine / backend | What it means |
+|---|---|---|
+| Ren'Py Vita 7 Legacy | SonicMastr · Python 2.7 | Historical runtime for older Ren'Py projects. Legacy dependencies and limited modern feature support. |
+| Ren'Py Vita 8 PVR 0.2.1 | Grimiku · Python 3.11 · PVR_PSP2 | The recommended first attempt for Ren'Py 8. The PVR release is standalone. |
+| Ren'Py Vita 8 VitaGL 0.2.1 | Grimiku · Python 3.11 · VitaGL | Alternative graphics backend, still experimental upstream; may be slower or glitchier and requires libshacccg.suprx under ur0:/data/ on the console. |
+
+The two Ren'Py Vita 8 archives have upstream SHA-256 digests pinned in the runtime catalogue. The 2021 Ren'Py Vita 7 Distribution Tool archive does not publish a digest; Studio computes and records its SHA-256 after downloading it and clearly marks that it was not upstream-pinned. Runtime archives are cached in ~/.local/share/renpy-vita-studio/runtimes/ (or $XDG_DATA_HOME/renpy-vita-studio/runtimes/).
+
+Downloads have size limits, ZIP path-traversal checks, symlink rejection and bounded extraction. Studio requires a usable eboot.bin in the downloaded runtime payload; an archive that does not contain one is rejected.
+
+## Generated Vita files
+
+- sce_sys/param.sfo — generated from the title, Title ID, app version and game category.
+- sce_sys/icon0.png — 128×128 bubble icon.
+- sce_sys/pic0.png — 960×544 launch image.
+- sce_sys/livearea/contents/bg0.png — 840×500 LiveArea background.
+- sce_sys/livearea/contents/startup.png — 280×158 startup image.
+- sce_sys/livearea/contents/template.xml — basic a1 LiveArea layout referencing bg0.png and startup.png.
+
+The images are encoded as compact indexed PNGs with per-asset size limits. The default Title ID generator creates a 4-letter + 5-digit Vita-format ID; the user can edit it. Avoid collisions with another installed app.
 
 ## Requirements
 
-- Python 3.11 or newer
-- Windows 10/11 or a maintained Linux distribution
-- No third-party runtime dependencies for the current core
+- Python 3.11 or newer.
+- Tkinter (python3-tk on Debian/Ubuntu/MX Linux).
+- Pillow (installed as a project dependency).
+- VitaSDK installed and vita-pack-vpk available in PATH to create the VPK.
 
-## Run from source
+On MX Linux / Debian-based systems, install the GUI and packaging prerequisites:
 
-\`\`\`sh
-cd tooling/renpy-vita-studio
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# Linux:   source .venv/bin/activate
-python -m pip install -e .
-renpy-vita-studio --help
-renpy-vita-studio doctor
-renpy-vita-studio profiles
-\`\`\`
+    sudo apt install python3-tk
+    cd tooling/renpy-vita-studio
+    python3 -m venv .venv
+    . .venv/bin/activate
+    python -m pip install --upgrade pip
+    python -m pip install -e .
+    renpy-vita-studio-gui
 
-## Examples
+CLI inspection and lower-level commands remain available:
 
-\`\`\`sh
-# Inventory a project
-renpy-vita-studio inspect "/path/to/Game" --json
+    renpy-vita-studio --help
+    renpy-vita-studio inspect "/path/to/original-game" --json
+    renpy-vita-studio doctor
+    renpy-vita-studio profiles
+    renpy-vita-studio build-plan
 
-# Compare detected runtime evidence with the reference profiles
-renpy-vita-studio profiles
+## Compatibility preflight
 
-# Inspect/extract a standard archive
-renpy-vita-studio rpa list "/path/to/Game/game/archive.rpa" --json
-renpy-vita-studio rpa extract "/path/to/Game/game/archive.rpa" "./rpa-extract"
+The preflight reports evidence such as Ren'Py engine fingerprints, video files, native libraries, archives and other compatibility hints. It does not execute game code or guarantee that the selected runtime can run the game. In particular:
+- Video playback is not generally supported by the referenced Vita runtimes.
+- Native libraries compiled for Windows, Linux or desktop macOS are not Vita binaries.
+- Custom/encrypted archive variants and RPYC decompilation are not handled.
+- Game-specific script changes, screen/input adjustments, memory constraints and save compatibility may still require manual porting work.
 
-# Prepare a Vita app folder (copies eboot.bin too if the runtime build supplied it)
-renpy-vita-studio stage "/path/to/Game" "./vita-output" --title-id PCSE00001
+Studio never edits the original game directory. It rejects symlinks inside game/ and refuses to overwrite an existing VPK.
 
-# Package only after a compatible runtime has produced eboot.bin
-renpy-vita-studio vpk "./vita-output/app/PCSE00001" "./release/Game.vpk"
-\`\`\`
+## Validation boundaries
 
-The staging command expects a project root containing both \`game/\` and \`sce_sys/\`, including \`sce_sys/param.sfo\` and \`sce_sys/icon0.png\`. It creates \`vita-output/app/PCSE00001/\`. Supply the correct title ID and metadata yourself; the tool does not invent or rewrite them.
-
-## Safety boundaries
-
-- Only standard RPA-2.0 and RPA-3.0 are supported in this preview.
-- Custom/encrypted archive variants and RPA-1.0 / standalone RPI are not supported.
-- RPYC files are inventoried but never unpickled or decompiled.
-- The inspector does not execute \`options.rpy\` or other game code.
-- Staging refuses to overwrite an existing \`app/<TITLE_ID>\` and never edits the source project.
-- \`param.sfo\` is checked for a PSF header only; fields are not parsed or rewritten.
-- PNG checks validate the header and dimensions, not full image decoding or Vita-specific size requirements. LiveArea assets are reported, not checked against a device-specific artwork profile.
-- The manifest hashes staged payload files; it is not a signature or compatibility certificate.
-- No DRM bypass, decryption, game-data redistribution or proprietary payload bundling.
-- The `vpk` command only wraps an already-built `eboot.bin` with VitaSDK's `vita-pack-vpk`; it does not compile or adapt the Ren'Py runtime, sign binaries, install the package or validate execution on a Vita.
-
-## Runtime build plans
-
-Studio includes a non-executing build-plan generator for the two reference runtimes. Run `renpy-vita-studio build-plan` to compare both checklists, or pass `--profile sonicmastr-python27` / `--profile grimiku-python311` to inspect one.
-
-The legacy profile calls out Python 2.7.18, VitaSDK, Cython (the public README does not state an exact pin), PVR_PSP2 assets and SDL2 with `VIDEO_VITA_PVR=ON`. The Ren'Py 8 profile calls out Python 3.11, Cython 0.29.37 (not 3.x), rsync, 7-Zip, OpenSSL 1.1.1 integration, Vita-specific CPython changes and the HarfBuzz-enabled FreeType requirement.
-
-These plans are checklists, not lockfiles or reproducible-build claims. They never run upstream scripts, download mutable dependencies or modify the host SDK. Audit upstream revisions and licensing before running any build manually.
+A successful build means the VPK tool created an archive and Studio verified its CRCs and expected entries. It does not mean the package has been installed or launched successfully on a physical PS Vita. VitaGL additionally requires the console-side SHACCCG module. Device testing remains a separate required step.
 
 ## Development
 
-\`\`\`sh
-PYTHONPATH=src python -m unittest discover -s tests -v
-\`\`\`
+    python -m pip install -e .
+    PYTHONPATH=src python -m unittest discover -s tests -v
 
-## Relationship to upstream
-
-The native runtime baseline is [SonicMastr/renpy-vita](https://github.com/SonicMastr/renpy-vita). This core is a new SPDW Factory desktop-side tool, not a claim that the upstream Distribution Tool source was available or directly refactored. Runtime adapters for the legacy Python 2.7 port and the community Python 3.11 Ren'Py Vita 8 port must remain separate until their licensing, APIs and build requirements are audited.
-
-## Roadmap
-
-1. Broaden archive fixtures and engine/runtime fingerprint coverage.
-2. Expand LiveArea asset dimension checks and validate title metadata against runtime profiles.
-3. Turn the current reference profiles into audited runtime adapters with pinned dependencies and reproducible build scripts.
-4. Extend the VPK wrapper with reproducible build manifests and runtime build integration.
-5. Desktop GUI and optional USB/network device integration.
-6. Evaluate a Vita-side companion only for tasks that fit Vita memory and native APIs.
+The desktop GUI entry point is renpy-vita-studio-gui. The CLI entry point remains renpy-vita-studio.
