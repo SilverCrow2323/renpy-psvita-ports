@@ -10,6 +10,7 @@ from .builder import build_game_vpk
 from .project_source import resolve_game_directory, discover_artwork, default_title_id
 from .runtime_catalog import RUNTIMES
 from .runtime_manager import get_installed_runtime
+from .inspect import inspect_project
 
 class StudioApp:
     def __init__(self, root: tk.Tk):
@@ -66,7 +67,7 @@ class StudioApp:
         row = ttk.Frame(tab); row.pack(fill="x")
         ttk.Entry(row, textvariable=self.project_var).pack(side="left", fill="x", expand=True)
         ttk.Button(row, text="Browse…", command=self._browse_project).pack(side="left", padx=(8,0))
-        ttk.Label(tab, text="Studio reads the selected project's game/ directory and ignores any existing Vita packaging scaffolding.", style="Sub.TLabel", wraplength=740).pack(anchor="w", pady=14)
+        ttk.Label(tab, text="Studio reads the selected project's game/ directory and ignores existing Vita packaging scaffolding.", style="Sub.TLabel", wraplength=740).pack(anchor="w", pady=14)
         ttk.Button(tab, text="Inspect game folder", command=self._inspect_project).pack(anchor="w")
         self.project_report = tk.Text(tab, height=13, bg="#0b1220", fg="#d1d5db", relief="flat", wrap="word")
         self.project_report.pack(fill="both", expand=True, pady=(14,0))
@@ -125,11 +126,19 @@ class StudioApp:
             title=root.name.replace("_"," ").replace("-"," ").strip() or "Ren'Py Game"
             self.title_var.set(title)
             self.title_id_var.set(default_title_id(title, root))
+            report=inspect_project(root)
             self.project_report.delete("1.0","end")
             self.project_report.insert("end", f"Project: {root}\nGame data: {game}\nFiles: {len(files):,}\nSize: {size/1024/1024:.1f} MiB\n")
-            self.project_report.insert("end", "\nOnly game/ will be copied into the Vita app. Existing sce_sys, eboot.bin or LiveArea folders are not required.\n")
+            self.project_report.insert("end", "\nCompatibility preflight (not a guarantee):\n")
+            for hint in report.get("compatibility_hints", []):
+                self.project_report.insert("end", "• "+str(hint)+"\n")
+            if report.get("video_files"):
+                self.project_report.insert("end", f"\nVideo files detected: {len(report['video_files'])} — the Vita runtime does not provide general video playback.\n")
+            if report.get("native_libraries"):
+                self.project_report.insert("end", f"Native libraries detected: {len(report['native_libraries'])} — desktop binaries cannot be assumed to work on Vita.\n")
+            self.project_report.insert("end", "\nOnly game/ will be copied. Existing sce_sys, eboot.bin or LiveArea folders are not required.\n")
             self._scan_artwork()
-            self.status_var.set("Game folder detected. Continue to runtime selection.")
+            self.status_var.set("Game folder detected. Review the compatibility notes, then choose a runtime.")
         except Exception as exc:
             messagebox.showerror("Project inspection", str(exc))
 
@@ -179,24 +188,31 @@ class StudioApp:
     def _start_build(self):
         try:
             resolve_game_directory(self.project_var.get())
-            if not self.title_var.get().strip():
+            title=self.title_var.get().strip()
+            title_id=self.title_id_var.get().strip()
+            project=self.project_var.get()
+            runtime_id=self.runtime_var.get()
+            artwork=self._selected_artwork()
+            output=self.output_var.get().strip()
+            if not title:
                 raise ValueError("Enter a game title.")
-            if not self.title_id_var.get().strip():
+            if not title_id:
                 raise ValueError("Enter a Vita Title ID.")
-            if not self.output_var.get().strip():
+            if not output:
                 self._browse_output()
-            if not self.output_var.get().strip():
+                output=self.output_var.get().strip()
+            if not output:
                 return
             self.build_button.configure(state="disabled")
             self.log.delete("1.0","end")
             def progress(message):
-                self.root.after(0, lambda: self._log(message))
+                self.root.after(0, lambda msg=message: self._log(msg))
             def worker():
                 try:
-                    result=build_game_vpk(self.project_var.get(),self.runtime_var.get(),self.title_var.get().strip(),self.title_id_var.get().strip(),self.output_var.get(),self._selected_artwork(),progress)
-                    self.root.after(0,lambda:self._build_done(result))
+                    result=build_game_vpk(project,runtime_id,title,title_id,output,artwork,progress)
+                    self.root.after(0,lambda res=result:self._build_done(res))
                 except Exception as exc:
-                    self.root.after(0,lambda:self._build_failed(str(exc)))
+                    self.root.after(0,lambda err=str(exc):self._build_failed(err))
             threading.Thread(target=worker,daemon=True).start()
         except Exception as exc:
             messagebox.showerror("Build",str(exc))

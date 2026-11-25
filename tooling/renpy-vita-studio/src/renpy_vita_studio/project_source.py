@@ -26,6 +26,9 @@ def resolve_game_directory(selected: str | Path) -> tuple[Path, Path]:
         raise ProjectSourceError("The selected game/ folder is empty.")
     if game.is_symlink():
         raise ProjectSourceError("The game/ directory cannot be a symbolic link.")
+    for path in game.rglob("*"):
+        if path.is_symlink():
+            raise ProjectSourceError(f"Symbolic links are not allowed inside game/: {path}")
     return project_root, game
 
 def discover_artwork(game_dir: str | Path, limit: int = 300) -> list[Path]:
@@ -43,7 +46,6 @@ def discover_artwork(game_dir: str | Path, limit: int = 300) -> list[Path]:
             continue
         if len(found) >= limit:
             break
-    # Prefer larger, likely cover/background images while retaining deterministic order.
     return sorted(found, key=lambda p: (p.stat().st_size if p.exists() else 0), reverse=True)
 
 def default_title_id(title: str, project_path: str | Path) -> str:

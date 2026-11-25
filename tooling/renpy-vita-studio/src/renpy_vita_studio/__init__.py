@@ -1,3 +1,3 @@
-"""Ren'Py Vita Studio — safe project inspection and preparation."""
+"""Ren'Py Vita Studio — guided project inspection and VPK builder."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
