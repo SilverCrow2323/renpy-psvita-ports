@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "renpy-vita-studio"
+version = "0.2.0"
+description = "Guided desktop builder for user-supplied Ren'Py projects targeting PlayStation Vita."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "SPDW Factory" }]
+dependencies = ["Pillow>=10.0"]
+
+[project.scripts]
+renpy-vita-studio = "renpy_vita_studio.cli:main"
+renpy-vita-studio-gui = "renpy_vita_studio.desktop:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

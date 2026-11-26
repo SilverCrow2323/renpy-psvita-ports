@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Ren'Py Vita Studio
+Comment=Build Ren'Py game projects for PlayStation Vita
+Exec=renpy-vita-studio-gui
+Icon=renpy-vita-studio
+Terminal=false
+Categories=Game;Development;
+StartupNotify=true

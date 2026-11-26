@@ -1,0 +1,61 @@
+name: Ren'Py Vita Studio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tooling/renpy-vita-studio/**"
+      - ".github/workflows/renpy-vita-studio.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tooling/renpy-vita-studio/**"
+      - ".github/workflows/renpy-vita-studio.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install Studio dependencies
+        run: python -m pip install -e tooling/renpy-vita-studio
+      - name: Compile Python sources
+        run: python -m compileall -q tooling/renpy-vita-studio/src/renpy_vita_studio
+      - name: Run test suite
+        env:
+          PYTHONPATH: tooling/renpy-vita-studio/src
+        run: python -m unittest discover -s tooling/renpy-vita-studio/tests -v
+      - name: Check CLI entry point
+        env:
+          PYTHONPATH: tooling/renpy-vita-studio/src
+        run: python -m renpy_vita_studio --help
+
+  deb-package:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Debian packaging script
+        run: bash -n tooling/renpy-vita-studio/packaging/linux/build-deb.sh
+      - name: Build Debian package
+        run: bash tooling/renpy-vita-studio/packaging/linux/build-deb.sh "$GITHUB_WORKSPACE/renpy-vita-studio.deb"
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: renpy-vita-studio-deb
+          path: renpy-vita-studio.deb
+          if-no-files-found: error
