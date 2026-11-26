@@ -1,0 +1,50 @@
+name: Ren'Py Vita test report
+description: Report a real compatibility or gameplay test for a Ren'Py Vita port.
+title: "[TEST] "
+labels: ["test-report"]
+body:
+  - type: input
+    id: game
+    attributes:
+      label: Game and port
+      description: Exact game title and repository/release tested.
+      placeholder: Game title — port release
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Vita model and firmware
+      placeholder: PS Vita 1000, firmware 3.65 Ensō
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Ren'Py Vita runtime/build
+      description: Include the runtime version or build identifier if known.
+  - type: dropdown
+    id: result
+    attributes:
+      label: Test result
+      options:
+        - Boots and playable
+        - Boots with visual/audio issues
+        - Crashes during gameplay
+        - Does not boot
+        - Not tested yet
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include the exact scene/action and whether the issue is repeatable.
+      placeholder: "1. Launch the port…"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots or video
+      description: Attach evidence where possible. Remove personal data before posting.
