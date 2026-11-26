@@ -1,0 +1,38 @@
+name: Port bug report
+description: Report a reproducible issue with a specific Ren'Py PSVita port.
+title: "[Port bug]: "
+labels: ["bug", "port-report"]
+body:
+  - type: input
+    id: port
+    attributes:
+      label: Port repository / game
+      placeholder: Sakura Succubus 2
+    validations:
+      required: true
+  - type: input
+    id: vita
+    attributes:
+      label: Vita model and firmware
+      placeholder: PS Vita 1000, firmware 3.65 Ensō
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Remove personal paths, account names, tokens and other private information.
+    validations:
+      required: false
