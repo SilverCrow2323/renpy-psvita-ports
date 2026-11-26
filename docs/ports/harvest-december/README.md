@@ -1,6 +1,6 @@
 # Harvest December: Reharvested! Portable
 
-<badge>In progress</badge>
+**Status: In progress**
 
 Repository: [Harvest-December-Reharvested-Portable](https://github.com/SilverCrow2323/Harvest-December-Reharvested-Portable)
 

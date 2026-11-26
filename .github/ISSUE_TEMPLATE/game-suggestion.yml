@@ -1,0 +1,38 @@
+name: Suggest a Ren'Py game
+description: Suggest a game for compatibility research and a possible Vita port.
+title: "[Game suggestion]: "
+labels: ["game-suggestion", "research"]
+body:
+  - type: input
+    id: game
+    attributes:
+      label: Game title
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Official store or developer page
+    validations:
+      required: true
+  - type: input
+    id: engine
+    attributes:
+      label: Known engine / Ren'Py version
+      placeholder: Unknown if not confirmed
+    validations:
+      required: false
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Why might it work on Vita?
+      description: Mention video playback, 3D scenes, custom renderers or other known blockers.
+    validations:
+      required: false
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Source and rights
+      options:
+        - label: I have linked an official source and understand that game files must be obtained legally.
+          required: true

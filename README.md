@@ -88,6 +88,7 @@ _(The "FAILED PORTS" list contains basic Ren'Py-Vita conversions WITHOUT further
 - [Sakura Succubus 4 Vita](https://github.com/SilverCrow2323/Sakura-Succubus-4-Vita)
 - [DDLC Mod - Magical Literary Heroine Natsuki Saves The Literature Club! Vita](https://github.com/SilverCrow2323/Magical-Literary-Heroine-Natsuki-Saves-The-Literature-Club-Vita)
 - [HIKE BACK Vita](https://github.com/SilverCrow2323/HIKE-BACK-Vita)
+- [Harvest December: Reharvested! Portable](https://github.com/SilverCrow2323/Harvest-December-Reharvested-Portable) — in progress
 
 ## Other Ren'Py Vita Ports
 - [Doki Doki Literature Club Vita](https://github.com/SonicMastr/Doki-Doki-Literature-Club-Vita)<br>
@@ -96,6 +97,16 @@ _(The "FAILED PORTS" list contains basic Ren'Py-Vita conversions WITHOUT further
 
 ---
 
-## 📚 Practical Wiki
+## Central documentation and catalogue
 
-The [GitHub Wiki](https://github.com/SilverCrow2323/Renpy-Vita-Portings/wiki) explains compatibility limits, port status, how to suggest a game and how to report test results. The tracked Markdown source is in [wiki-source/](wiki-source/); publish reviewed pages with `sh tools/publish_wiki.sh`.
+This repository is the single documentation and catalogue hub for the Ren'Py PSVita ports. The separate GitHub Wiki has been retired; versioned Markdown now lives in `docs/`.
+
+- [Port catalogue](catalog/ports.json)
+- [Port-specific installation and troubleshooting pages](docs/ports/README.md)
+- [Compatibility limits](docs/Compatibility-Limits.md)
+- [FAQ](docs/FAQ.md)
+- [Game suggestions](docs/Game-Suggestions.md)
+- [Port status](docs/Port-Status.md)
+- [Testing checklist](docs/Testing-Checklist.md)
+
+Use the central Issues page for new game suggestions and cross-port reports. Report build-specific defects in the relevant port repository.
